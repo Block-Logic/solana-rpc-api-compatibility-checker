@@ -1,3 +1,4 @@
+mod get_epoch_info;
 mod get_health;
 
 use crate::config::Config;
@@ -6,6 +7,8 @@ use anyhow::{Context, Result};
 use reqwest::header::CONTENT_TYPE;
 use serde::Serialize;
 use serde_json::Value;
+use std::cmp::Ordering;
+use std::collections::BTreeSet;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::{Duration, Instant, sleep};
@@ -17,31 +20,53 @@ pub struct CompatibilityReport {
 
 impl CompatibilityReport {
     pub fn has_failures(&self) -> bool {
-        self.checks.iter().any(|check| !check.passed)
+        self.checks
+            .iter()
+            .any(|check| matches!(check.status, CheckStatus::Failed))
     }
 
     pub fn print_summary(&self) {
         for check in &self.checks {
-            let status = if check.passed { "PASS" } else { "FAIL" };
-            println!(
-                "[{status}] {} [{}] - {}",
-                check.fixture_name, check.request_encoding, check.details
-            );
+            let status = match check.status {
+                CheckStatus::Passed => "PASS",
+                CheckStatus::Failed => "FAIL",
+                CheckStatus::Skipped => "SKIP",
+            };
+            println!("[{status}] {} - {}", check.fixture_name, check.details);
         }
 
-        let passed = self.checks.iter().filter(|check| check.passed).count();
-        let failed = self.checks.len() - passed;
+        let passed = self
+            .checks
+            .iter()
+            .filter(|check| matches!(check.status, CheckStatus::Passed))
+            .count();
+        let failed = self
+            .checks
+            .iter()
+            .filter(|check| matches!(check.status, CheckStatus::Failed))
+            .count();
+        let skipped = self
+            .checks
+            .iter()
+            .filter(|check| matches!(check.status, CheckStatus::Skipped))
+            .count();
         println!();
-        println!("Summary: {passed} passed, {failed} failed");
+        println!("Summary: {passed} passed, {failed} failed, {skipped} skipped");
     }
 }
 
 #[derive(Debug)]
 struct CheckOutcome {
     fixture_name: String,
-    request_encoding: String,
-    passed: bool,
+    status: CheckStatus,
     details: String,
+}
+
+#[derive(Debug)]
+enum CheckStatus {
+    Passed,
+    Failed,
+    Skipped,
 }
 
 #[derive(Debug)]
@@ -90,6 +115,8 @@ struct HttpResponseData {
 type MethodValidator = fn(&MethodExpectation, &Value) -> Result<String>;
 
 pub async fn run_checks(config: &Config, fixtures: &[RpcFixture]) -> Result<CompatibilityReport> {
+    validate_health_gate_requirements(fixtures)?;
+
     let client = reqwest::Client::builder()
         .user_agent(concat!(
             env!("CARGO_PKG_NAME"),
@@ -102,37 +129,40 @@ pub async fn run_checks(config: &Config, fixtures: &[RpcFixture]) -> Result<Comp
         config.minimum_request_interval_ms,
     )));
     let mut checks = Vec::new();
+    let ordered_fixtures = order_fixtures(fixtures);
+    let requires_health_gate = requires_health_gate(fixtures);
+    let mut health_failed = false;
 
-    for fixture in fixtures {
-        for request_encoding in &fixture.request.encodings {
-            let check = run_single_check(
-                &client,
-                throttler.clone(),
-                config,
-                fixture,
-                request_encoding,
-            )
-            .await
-            .with_context(|| {
-                format!(
-                    "fixture '{}' with request encoding '{}'",
-                    fixture.name, request_encoding
-                )
+    for fixture in ordered_fixtures {
+        if requires_health_gate && health_failed && fixture.method != "getHealth" {
+            checks.push(CheckOutcome {
+                fixture_name: fixture.name.clone(),
+                status: CheckStatus::Skipped,
+                details: "skipped because getHealth did not return ok".to_string(),
             });
+            continue;
+        }
 
-            match check {
-                Ok(details) => checks.push(CheckOutcome {
+        let check = run_single_check(&client, throttler.clone(), config, fixture)
+            .await
+            .with_context(|| format!("fixture '{}'", fixture.name));
+
+        match check {
+            Ok(details) => checks.push(CheckOutcome {
+                fixture_name: fixture.name.clone(),
+                status: CheckStatus::Passed,
+                details,
+            }),
+            Err(error) => {
+                if fixture.method == "getHealth" {
+                    health_failed = true;
+                }
+
+                checks.push(CheckOutcome {
                     fixture_name: fixture.name.clone(),
-                    request_encoding: request_encoding.clone(),
-                    passed: true,
-                    details,
-                }),
-                Err(error) => checks.push(CheckOutcome {
-                    fixture_name: fixture.name.clone(),
-                    request_encoding: request_encoding.clone(),
-                    passed: false,
+                    status: CheckStatus::Failed,
                     details: format!("{error:#}"),
-                }),
+                });
             }
         }
     }
@@ -145,14 +175,8 @@ async fn run_single_check(
     throttler: Arc<RequestThrottler>,
     config: &Config,
     fixture: &RpcFixture,
-    request_encoding: &str,
 ) -> Result<String> {
-    match request_encoding {
-        "json" => {}
-        other => anyhow::bail!("request encoding '{other}' is not implemented yet"),
-    }
-
-    let request_id = format!("{}:{request_encoding}", fixture.method);
+    let request_id = fixture.name.clone();
     let payload = JsonRpcRequest {
         jsonrpc: "2.0",
         id: request_id.clone(),
@@ -291,8 +315,50 @@ fn validate_charset(content_type: &str, expected_charset: &str) -> Result<()> {
 
 fn validator_for_method(method: &str) -> Result<MethodValidator> {
     match method {
+        "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),
         other => anyhow::bail!("no validator registered for RPC method '{other}'"),
+    }
+}
+
+fn requires_health_gate(fixtures: &[RpcFixture]) -> bool {
+    distinct_methods(fixtures).len() > 1
+}
+
+fn validate_health_gate_requirements(fixtures: &[RpcFixture]) -> Result<()> {
+    let methods = distinct_methods(fixtures);
+
+    if methods.len() > 1 && !methods.contains("getHealth") {
+        anyhow::bail!(
+            "multi-method runs must include a getHealth fixture so health can be checked first"
+        );
+    }
+
+    Ok(())
+}
+
+fn distinct_methods(fixtures: &[RpcFixture]) -> BTreeSet<&str> {
+    fixtures
+        .iter()
+        .map(|fixture| fixture.method.as_str())
+        .collect()
+}
+
+fn order_fixtures(fixtures: &[RpcFixture]) -> Vec<&RpcFixture> {
+    let mut ordered = fixtures.iter().collect::<Vec<_>>();
+    ordered.sort_by(|left, right| compare_fixtures(left, right));
+    ordered
+}
+
+fn compare_fixtures(left: &RpcFixture, right: &RpcFixture) -> Ordering {
+    match (left.method.as_str(), right.method.as_str()) {
+        ("getHealth", "getHealth") => left.name.cmp(&right.name),
+        ("getHealth", _) => Ordering::Less,
+        (_, "getHealth") => Ordering::Greater,
+        _ => left
+            .method
+            .cmp(&right.method)
+            .then_with(|| left.name.cmp(&right.name)),
     }
 }
 
@@ -307,10 +373,7 @@ mod tests {
         RpcFixture {
             name: "getHealth returns ok".to_string(),
             method: "getHealth".to_string(),
-            request: RequestFixture {
-                encodings: vec!["json".to_string()],
-                params: Vec::new(),
-            },
+            request: RequestFixture { params: Vec::new() },
             expectation: ResponseExpectation {
                 transport: TransportExpectation {
                     content_type_prefix: "application/json".to_string(),
@@ -337,10 +400,10 @@ mod tests {
         let response = HttpResponseData {
             status: reqwest::StatusCode::OK,
             content_type: Some("application/json; charset=utf-8".to_string()),
-            body_text: r#"{"jsonrpc":"2.0","result":"ok","id":"getHealth:json"}"#.to_string(),
+            body_text: r#"{"jsonrpc":"2.0","result":"ok","id":"getHealth returns ok"}"#.to_string(),
         };
 
-        let result = validate_response(&fixture(), "getHealth:json", &response);
+        let result = validate_response(&fixture(), "getHealth returns ok", &response);
 
         assert!(result.is_ok(), "expected validation to pass: {result:?}");
     }
@@ -356,10 +419,10 @@ mod tests {
         let response = HttpResponseData {
             status: reqwest::StatusCode::OK,
             content_type: Some("application/json; charset=utf-8".to_string()),
-            body_text: r#"{"jsonrpc":"2.0","id":"getHealth:json"}"#.to_string(),
+            body_text: r#"{"jsonrpc":"2.0","id":"getHealth returns ok"}"#.to_string(),
         };
 
-        let error = validate_response(&fixture(), "getHealth:json", &response)
+        let error = validate_response(&fixture(), "getHealth returns ok", &response)
             .expect_err("missing result should fail");
 
         assert!(
@@ -385,6 +448,107 @@ mod tests {
             error
                 .to_string()
                 .contains("response was missing required 'result' field")
+        );
+    }
+
+    #[test]
+    fn sorts_get_health_before_other_methods() {
+        let mut epoch_fixture = fixture();
+        epoch_fixture.name = "getEpochInfo finalized".to_string();
+        epoch_fixture.method = "getEpochInfo".to_string();
+        epoch_fixture.expectation.validator = MethodExpectation::EpochInfo {
+            required_result_attributes: vec![
+                "absoluteSlot".to_string(),
+                "blockHeight".to_string(),
+                "epoch".to_string(),
+                "slotIndex".to_string(),
+                "slotsInEpoch".to_string(),
+                "transactionCount".to_string(),
+            ],
+        };
+        epoch_fixture.request.params = vec![serde_json::json!({"commitment":"finalized"})];
+
+        let fixtures = [epoch_fixture, fixture()];
+        let ordered = order_fixtures(&fixtures);
+
+        assert_eq!(ordered[0].method, "getHealth");
+        assert_eq!(ordered[1].method, "getEpochInfo");
+    }
+
+    #[test]
+    fn rejects_multi_method_runs_without_get_health() {
+        let fixtures = vec![
+            RpcFixture {
+                name: "getEpochInfo finalized".to_string(),
+                method: "getEpochInfo".to_string(),
+                request: RequestFixture {
+                    params: vec![serde_json::json!({"commitment":"finalized"})],
+                },
+                expectation: ResponseExpectation {
+                    transport: TransportExpectation {
+                        content_type_prefix: "application/json".to_string(),
+                        charset: "utf-8".to_string(),
+                    },
+                    envelope: JsonRpcEnvelopeExpectation {
+                        jsonrpc_version: "2.0".to_string(),
+                        required_attributes: vec![
+                            "jsonrpc".to_string(),
+                            "result".to_string(),
+                            "id".to_string(),
+                        ],
+                        allow_error: false,
+                    },
+                    validator: MethodExpectation::EpochInfo {
+                        required_result_attributes: vec![
+                            "absoluteSlot".to_string(),
+                            "blockHeight".to_string(),
+                            "epoch".to_string(),
+                            "slotIndex".to_string(),
+                            "slotsInEpoch".to_string(),
+                            "transactionCount".to_string(),
+                        ],
+                    },
+                },
+            },
+            RpcFixture {
+                name: "getBalance sample".to_string(),
+                method: "getBalance".to_string(),
+                request: RequestFixture { params: Vec::new() },
+                expectation: ResponseExpectation {
+                    transport: TransportExpectation {
+                        content_type_prefix: "application/json".to_string(),
+                        charset: "utf-8".to_string(),
+                    },
+                    envelope: JsonRpcEnvelopeExpectation {
+                        jsonrpc_version: "2.0".to_string(),
+                        required_attributes: vec![
+                            "jsonrpc".to_string(),
+                            "result".to_string(),
+                            "id".to_string(),
+                        ],
+                        allow_error: false,
+                    },
+                    validator: MethodExpectation::EpochInfo {
+                        required_result_attributes: vec![
+                            "absoluteSlot".to_string(),
+                            "blockHeight".to_string(),
+                            "epoch".to_string(),
+                            "slotIndex".to_string(),
+                            "slotsInEpoch".to_string(),
+                            "transactionCount".to_string(),
+                        ],
+                    },
+                },
+            },
+        ];
+
+        let error =
+            validate_health_gate_requirements(&fixtures).expect_err("missing health fixture");
+
+        assert!(
+            error
+                .to_string()
+                .contains("must include a getHealth fixture")
         );
     }
 }

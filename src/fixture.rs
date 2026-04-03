@@ -13,8 +13,6 @@ pub struct RpcFixture {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct RequestFixture {
-    #[serde(default = "default_request_encodings")]
-    pub encodings: Vec<String>,
     #[serde(default)]
     pub params: Vec<serde_json::Value>,
 }
@@ -44,11 +42,12 @@ pub struct JsonRpcEnvelopeExpectation {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum MethodExpectation {
-    StringResult { allowed_values: Vec<String> },
-}
-
-fn default_request_encodings() -> Vec<String> {
-    vec!["json".to_string()]
+    StringResult {
+        allowed_values: Vec<String>,
+    },
+    EpochInfo {
+        required_result_attributes: Vec<String>,
+    },
 }
 
 fn default_required_response_attributes() -> Vec<String> {
@@ -103,7 +102,6 @@ mod tests {
                 "name": "getHealth returns ok",
                 "method": "getHealth",
                 "request": {
-                    "encodings": ["json"],
                     "params": []
                 },
                 "expectation": {
@@ -125,7 +123,7 @@ mod tests {
         .expect("fixture should parse");
 
         assert_eq!(fixture.method, "getHealth");
-        assert_eq!(fixture.request.encodings, vec!["json"]);
+        assert!(fixture.request.params.is_empty());
         assert_eq!(
             fixture.expectation.envelope.required_attributes,
             vec!["jsonrpc", "result", "id"]
@@ -134,18 +132,19 @@ mod tests {
             MethodExpectation::StringResult { allowed_values } => {
                 assert_eq!(allowed_values, vec!["ok"]);
             }
+            MethodExpectation::EpochInfo {
+                required_result_attributes: _,
+            } => panic!("expected stringResult validator"),
         }
     }
 
     #[test]
-    fn defaults_request_encoding_to_json() {
+    fn defaults_request_params_to_empty_array() {
         let fixture: RpcFixture = serde_json::from_str(
             r#"{
-                "name": "default encoding",
+                "name": "default params",
                 "method": "getHealth",
-                "request": {
-                    "params": []
-                },
+                "request": {},
                 "expectation": {
                     "transport": {
                         "content_type_prefix": "application/json",
@@ -163,7 +162,7 @@ mod tests {
         )
         .expect("fixture should parse");
 
-        assert_eq!(fixture.request.encodings, vec!["json"]);
+        assert!(fixture.request.params.is_empty());
         assert_eq!(
             fixture.expectation.envelope.required_attributes,
             vec!["jsonrpc", "result", "id"]
