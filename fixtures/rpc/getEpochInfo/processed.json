@@ -1,0 +1,32 @@
+{
+  "name": "getEpochInfo with processed commitment",
+  "method": "getEpochInfo",
+  "request": {
+    "params": [
+      {
+        "commitment": "processed"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "epochInfo",
+      "required_result_attributes": [
+        "absoluteSlot",
+        "blockHeight",
+        "epoch",
+        "slotIndex",
+        "slotsInEpoch",
+        "transactionCount"
+      ]
+    }
+  }
+}

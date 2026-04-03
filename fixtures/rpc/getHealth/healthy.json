@@ -2,7 +2,6 @@
   "name": "getHealth returns ok",
   "method": "getHealth",
   "request": {
-    "encodings": ["json"],
     "params": []
   },
   "expectation": {

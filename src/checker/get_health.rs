@@ -5,6 +5,7 @@ use serde_json::Value;
 pub fn validate(expectation: &MethodExpectation, result: &Value) -> Result<String> {
     let allowed_values = match expectation {
         MethodExpectation::StringResult { allowed_values } => allowed_values,
+        other => anyhow::bail!("getHealth expected a stringResult validator, received {other:?}"),
     };
 
     let actual = result

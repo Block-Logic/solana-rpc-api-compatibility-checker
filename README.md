@@ -17,6 +17,7 @@ The checker currently:
 - enforces a minimum 500 ms delay between requests so the process never exceeds 2 requests/second
 - validates the HTTP success status, `Content-Type`, charset, and JSON-RPC envelope
 - dispatches each fixture to a method-specific validator after the shared checks pass
+- starts multi-method runs with `getHealth` and skips later methods if health is not `ok`
 
 ## Run the checker
 
@@ -37,7 +38,6 @@ Each fixture file is a local JSON document that describes one RPC method scenari
   "name": "getHealth returns ok",
   "method": "getHealth",
   "request": {
-    "encodings": ["json"],
     "params": []
   },
   "expectation": {
@@ -59,16 +59,21 @@ Each fixture file is a local JSON document that describes one RPC method scenari
 
 The top-level shape is now method-agnostic:
 
-- `request.encodings` lists which request encodings to exercise for that method
 - `request.params` holds the JSON-RPC params for the scenario
 - `expectation.transport` covers shared HTTP checks
 - `expectation.envelope` covers shared JSON-RPC checks
 - `expectation.envelope.required_attributes` lists the response fields that must be present
-- `expectation.validator` holds the method-specific assertion payload
+- `expectation.validator` holds the method-specific assertion payload, including required fields inside `result` when needed
 
-This lets us add the next methods with mostly data entry plus a small validator function. For example,
-methods that return parsed account data can reuse the shared transport and envelope checks while
-introducing a validator tailored to that result shape.
+Each fixture now represents one concrete RPC scenario. That maps more cleanly to methods like
+`getEpochInfo`, whose request config supports `commitment` and `minContextSlot` but not an encoding
+parameter in the request object. Methods that need multiple encoding-style scenarios can express them
+as separate fixtures with different `params`.
+
+## Current methods
+
+- `getHealth`: validates the health string response and is used as the gate for multi-method runs
+- `getEpochInfo`: validates the documented epoch info object for `processed`, `confirmed`, and `finalized` commitments
 
 ## Project layout
 
@@ -76,7 +81,9 @@ introducing a validator tailored to that result shape.
 - `src/fixture.rs`: parses recursive, method-agnostic RPC fixtures
 - `src/checker/mod.rs`: shared runner, throttling, transport checks, and validator dispatch
 - `src/checker/get_health.rs`: method-specific validation for `getHealth`
+- `src/checker/get_epoch_info.rs`: method-specific validation for `getEpochInfo`
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
+- `fixtures/rpc/getEpochInfo/`: commitment-specific fixtures for `getEpochInfo`
 
 ## Next steps
 
