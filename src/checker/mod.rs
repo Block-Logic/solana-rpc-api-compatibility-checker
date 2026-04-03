@@ -1,9 +1,10 @@
+mod get_block;
 mod get_epoch_info;
 mod get_health;
 mod get_transaction;
 
 use crate::config::Config;
-use crate::fixture::{MethodExpectation, RpcFixture};
+use crate::fixture::{JsonRpcErrorExpectation, MethodExpectation, RpcFixture};
 use anyhow::{Context, Result};
 use reqwest::StatusCode;
 use reqwest::header::CONTENT_TYPE;
@@ -275,7 +276,6 @@ fn validate_response(
 
     let jsonrpc_value = require_attribute(&document, "jsonrpc")?;
     let response_id_value = require_attribute(&document, "id")?;
-    let result = require_attribute(&document, "result")?;
 
     let jsonrpc = jsonrpc_value
         .as_str()
@@ -294,12 +294,21 @@ fn validate_response(
         anyhow::bail!("expected id='{request_id}', received '{response_id}'");
     }
 
-    if !fixture.expectation.envelope.allow_error
-        && let Some(error) = document.get("error")
-    {
-        anyhow::bail!("response contained JSON-RPC error payload: {error}");
+    if let Some(error) = document.get("error") {
+        if !fixture.expectation.envelope.allow_error {
+            anyhow::bail!("response contained JSON-RPC error payload: {error}");
+        }
+
+        let error_details =
+            validate_expected_error(error, fixture.expectation.envelope.expected_error.as_ref())?;
+
+        return Ok(format!(
+            "status={} content-type='{}' {}",
+            response.status, content_type, error_details
+        ));
     }
 
+    let result = require_attribute(&document, "result")?;
     let validator = validator_for_method(&fixture.method)?;
     let method_details = validator(&fixture.expectation.validator, result)?;
 
@@ -323,6 +332,46 @@ fn require_attribute<'a>(document: &'a Value, attribute_name: &str) -> Result<&'
         .with_context(|| format!("response was missing required '{attribute_name}' field"))
 }
 
+fn validate_expected_error(
+    error: &Value,
+    expected_error: Option<&JsonRpcErrorExpectation>,
+) -> Result<String> {
+    let expected_error =
+        expected_error.context("fixture allowed JSON-RPC errors but did not define expected_error")?;
+    let error_object = error
+        .as_object()
+        .context("error field was not an object")?;
+
+    let actual_code = error_object
+        .get("code")
+        .and_then(Value::as_i64)
+        .context("error.code field was not a signed integer")?;
+    if actual_code != expected_error.code {
+        anyhow::bail!(
+            "expected error.code={}, received {}",
+            expected_error.code,
+            actual_code
+        );
+    }
+
+    let actual_message = error_object
+        .get("message")
+        .and_then(Value::as_str)
+        .context("error.message field was not a string")?;
+    if actual_message != expected_error.message {
+        anyhow::bail!(
+            "expected error.message='{}', received '{}'",
+            expected_error.message,
+            actual_message
+        );
+    }
+
+    Ok(format!(
+        "error.code={} error.message='{}'",
+        actual_code, actual_message
+    ))
+}
+
 fn validate_charset(content_type: &str, expected_charset: &str) -> Result<()> {
     let lower = content_type.to_ascii_lowercase();
     let expected = expected_charset.to_ascii_lowercase();
@@ -341,6 +390,7 @@ fn validate_charset(content_type: &str, expected_charset: &str) -> Result<()> {
 
 fn validator_for_method(method: &str) -> Result<MethodValidator> {
     match method {
+        "getBlock" => Ok(get_block::validate),
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),
         "getTransaction" => Ok(get_transaction::validate),
@@ -414,6 +464,7 @@ mod tests {
                         "id".to_string(),
                     ],
                     allow_error: false,
+                    expected_error: None,
                 },
                 validator: MethodExpectation::StringResult {
                     allowed_values: vec!["ok".to_string()],
@@ -456,6 +507,78 @@ mod tests {
             error
                 .to_string()
                 .contains("response was missing required 'result' field")
+        );
+    }
+
+    #[test]
+    fn validates_expected_json_rpc_error_response() {
+        let mut fixture = fixture();
+        fixture.name = "getBlock skipped slot".to_string();
+        fixture.method = "getBlock".to_string();
+        fixture.request.params = vec![
+            serde_json::json!(410842412),
+            serde_json::json!({
+                "commitment": "finalized",
+                "encoding": "json",
+                "transactionDetails": "full",
+                "maxSupportedTransactionVersion": 0,
+                "rewards": true
+            }),
+        ];
+        fixture.expectation.envelope.required_attributes =
+            vec!["jsonrpc".to_string(), "error".to_string(), "id".to_string()];
+        fixture.expectation.envelope.allow_error = true;
+        fixture.expectation.envelope.expected_error = Some(JsonRpcErrorExpectation {
+            code: -32007,
+            message: "Slot 410842412 was skipped, or missing due to ledger jump to recent snapshot"
+                .to_string(),
+        });
+        fixture.expectation.validator = MethodExpectation::BlockSnapshot {
+            required_result_attributes: vec![],
+            expected_result: serde_json::json!(null),
+        };
+
+        let response = HttpResponseData {
+            status: reqwest::StatusCode::OK,
+            content_type: Some("application/json; charset=utf-8".to_string()),
+            body_text: r#"{"jsonrpc":"2.0","error":{"code":-32007,"message":"Slot 410842412 was skipped, or missing due to ledger jump to recent snapshot"},"id":"getBlock skipped slot"}"#.to_string(),
+        };
+
+        let result = validate_response(&fixture, "getBlock skipped slot", &response);
+
+        assert!(result.is_ok(), "expected validation to pass: {result:?}");
+    }
+
+    #[test]
+    fn rejects_unexpected_json_rpc_error_message() {
+        let mut fixture = fixture();
+        fixture.name = "getBlock skipped slot".to_string();
+        fixture.method = "getBlock".to_string();
+        fixture.expectation.envelope.required_attributes =
+            vec!["jsonrpc".to_string(), "error".to_string(), "id".to_string()];
+        fixture.expectation.envelope.allow_error = true;
+        fixture.expectation.envelope.expected_error = Some(JsonRpcErrorExpectation {
+            code: -32007,
+            message: "expected message".to_string(),
+        });
+        fixture.expectation.validator = MethodExpectation::BlockSnapshot {
+            required_result_attributes: vec![],
+            expected_result: serde_json::json!(null),
+        };
+
+        let response = HttpResponseData {
+            status: reqwest::StatusCode::OK,
+            content_type: Some("application/json; charset=utf-8".to_string()),
+            body_text: r#"{"jsonrpc":"2.0","error":{"code":-32007,"message":"actual message"},"id":"getBlock skipped slot"}"#.to_string(),
+        };
+
+        let error =
+            validate_response(&fixture, "getBlock skipped slot", &response).expect_err("should fail");
+
+        assert!(
+            error
+                .to_string()
+                .contains("expected error.message='expected message'")
         );
     }
 
@@ -518,13 +641,14 @@ mod tests {
                     },
                     envelope: JsonRpcEnvelopeExpectation {
                         jsonrpc_version: "2.0".to_string(),
-                        required_attributes: vec![
-                            "jsonrpc".to_string(),
-                            "result".to_string(),
-                            "id".to_string(),
-                        ],
-                        allow_error: false,
-                    },
+                    required_attributes: vec![
+                        "jsonrpc".to_string(),
+                        "result".to_string(),
+                        "id".to_string(),
+                    ],
+                    allow_error: false,
+                    expected_error: None,
+                },
                     validator: MethodExpectation::EpochInfo {
                         required_result_attributes: vec![
                             "absoluteSlot".to_string(),
@@ -548,13 +672,14 @@ mod tests {
                     },
                     envelope: JsonRpcEnvelopeExpectation {
                         jsonrpc_version: "2.0".to_string(),
-                        required_attributes: vec![
-                            "jsonrpc".to_string(),
-                            "result".to_string(),
-                            "id".to_string(),
-                        ],
-                        allow_error: false,
-                    },
+                    required_attributes: vec![
+                        "jsonrpc".to_string(),
+                        "result".to_string(),
+                        "id".to_string(),
+                    ],
+                    allow_error: false,
+                    expected_error: None,
+                },
                     validator: MethodExpectation::EpochInfo {
                         required_result_attributes: vec![
                             "absoluteSlot".to_string(),

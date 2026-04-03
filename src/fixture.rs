@@ -37,6 +37,14 @@ pub struct JsonRpcEnvelopeExpectation {
     pub required_attributes: Vec<String>,
     #[serde(default)]
     pub allow_error: bool,
+    #[serde(default)]
+    pub expected_error: Option<JsonRpcErrorExpectation>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct JsonRpcErrorExpectation {
+    pub code: i64,
+    pub message: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -49,6 +57,10 @@ pub enum MethodExpectation {
         required_result_attributes: Vec<String>,
     },
     TransactionSnapshot {
+        required_result_attributes: Vec<String>,
+        expected_result: serde_json::Value,
+    },
+    BlockSnapshot {
         required_result_attributes: Vec<String>,
         expected_result: serde_json::Value,
     },
@@ -132,6 +144,7 @@ mod tests {
             fixture.expectation.envelope.required_attributes,
             vec!["jsonrpc", "result", "id"]
         );
+        assert!(fixture.expectation.envelope.expected_error.is_none());
         match fixture.expectation.validator {
             MethodExpectation::StringResult { allowed_values } => {
                 assert_eq!(allowed_values, vec!["ok"]);
@@ -140,6 +153,10 @@ mod tests {
                 required_result_attributes: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::TransactionSnapshot {
+                required_result_attributes: _,
+                expected_result: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::BlockSnapshot {
                 required_result_attributes: _,
                 expected_result: _,
             } => panic!("expected stringResult validator"),
@@ -175,5 +192,6 @@ mod tests {
             fixture.expectation.envelope.required_attributes,
             vec!["jsonrpc", "result", "id"]
         );
+        assert!(fixture.expectation.envelope.expected_error.is_none());
     }
 }

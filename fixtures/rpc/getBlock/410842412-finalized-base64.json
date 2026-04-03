@@ -1,0 +1,36 @@
+{
+  "name": "getBlock 410842412 finalized base64",
+  "method": "getBlock",
+  "request": {
+    "params": [
+      410842412,
+      {
+        "commitment": "finalized",
+        "encoding": "base64",
+        "transactionDetails": "full",
+        "maxSupportedTransactionVersion": 0,
+        "rewards": true
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "error", "id"],
+      "allow_error": true,
+      "expected_error": {
+        "code": -32007,
+        "message": "Slot 410842412 was skipped, or missing due to ledger jump to recent snapshot"
+      }
+    },
+    "validator": {
+      "kind": "blockSnapshot",
+      "required_result_attributes": [],
+      "expected_result": null
+    }
+  }
+}
