@@ -1,0 +1,76 @@
+{
+  "name": "getBlock 000000001 finalized base58",
+  "method": "getBlock",
+  "request": {
+    "params": [
+      1,
+      {
+        "commitment": "finalized",
+        "encoding": "base58",
+        "transactionDetails": "full",
+        "maxSupportedTransactionVersion": 0,
+        "rewards": true
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "blockSnapshot",
+      "required_result_attributes": [
+        "blockHeight",
+        "blockTime",
+        "blockhash",
+        "parentSlot",
+        "previousBlockhash",
+        "rewards",
+        "transactions"
+      ],
+      "expected_result": {
+        "blockHeight": null,
+        "blockTime": null,
+        "blockhash": "AcknnkY4ok5BZuk69WijDETKVRUPZoMtniZHMe4ZaK1e",
+        "parentSlot": 0,
+        "previousBlockhash": "4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZAMdL4VZHirAn",
+        "rewards": [],
+        "transactions": [
+          {
+            "meta": null,
+            "transaction": [
+              "5q66EyEVQtpBVVjbwYaK7eb62rWiuda7VJrdWxS2CtFH6FnhoTeLfnJ24qG9VWg1tdtFsQNwTVR6VCxHsVHvsdQKaJQyXnxHX4umpNpwyF9HJtuvtxZjduDeV8RaVNz9tMZAE1PLad666brKdePYPytGrp6S4mfC638xzj6nuKXiGXJQAiYKxxsuhMm1D4Rstfg1EsmA9TCFxGetc4s16kWr2EkpY8youWwReQTbkbBpNANLroDHvbCzQGiggrBUDSgmnEMWNA4xmiBWkWKsr3A7NG8CYQZpeSacQSa8reeYUoRxDMEJB4MwQkLSupmPZfq82JYesvy7C7PeM8QjC2JnJTWpXmaenpRemKi6NiGQjPbcVawyW4ygLCKmhaLp2XjSHYaKEe5oC3ykQ55Kk5HCysNFFq89izNjLfTfwqDDExtXkjZohPTcpg7cDafBQb",
+              "base58"
+            ]
+          },
+          {
+            "meta": null,
+            "transaction": [
+              "6rrKXt3koGoUkLAFMntJCv4pyXpZj1SidSPqwWBCsvu3H17wtf1W45msv5JxUrduii9o6SoB527fuH36bGfb4ubsQAcmcf7GqCsAmCYRME7BcMsuJrqy44hUZg2DDjtKygBWzJosvaqvU4NNKMbN8F1MmTQSvhBr5xTDK4WUwJxidPUJf5QyY8moMTQ5RN42GqEi9wvHZTmdnzHWzmMCk59tibEvjimzgeUWpL5EKvyHiCe1bRB96SfYHq5iNZ9iB7junmLftJza9phHRHCqruRDUy6BgXZJ35szF4tQNumF9p5pvMuyAbqKUdtwhZkeyHVBMgyQvgRU18r1F3qMrkJw3hnCxCkXKMHQ6L53hinRHudGpczfHrD2ABbh9LpYkEWYs6nZkyhYUekiX6YJwbv2h3mzWfjCEdmTEw3CSEhZouhUHbPRZWnQs5yZwQDUYX",
+              "base58"
+            ]
+          },
+          {
+            "meta": null,
+            "transaction": [
+              "4ZkcRUixaCfuNdhBcx5mr2ofgqE2TZ4paQDhT7ojEasC4w86w3SA5bC55bXgpSrjEQ3ApmS8Z3quPQ1ZdeZ6bkYFcBnj8P2FEbtsD2FLwToxVputw629B971P4UKqA9Wz7CyTSdKEjifLoScE7fjEoiZyw4KRXFb6LcixRyXnLcQuXnLpzku1Nz3a6Q5L3eExXgXfrCeHqwGomMZvtSZkNpyMAv7hWYrc8xS6uvWReYCpe4NgYJfXRdHsQZNdspmg8jwTRM8wbUZTZHU6YEF2pysdQFv2arr9LBn2CLTaQHoR2VtwYUcmpeKd9wWei7X7Y9kQrswrBQmfZNZyJkcVejJtonagVVNE5Y1QCheqVpA9FdXnuwnrvWoqgomMUk2RBf3wFcvGcTSEVuNMyJSFnjq5r1moR5iAtKs3iAfsZDxthJqPs8B5wXbqzLHVHrSpo",
+              "base58"
+            ]
+          },
+          {
+            "meta": null,
+            "transaction": [
+              "79KJWzZxJaMWoekw8aQRx6uf8BSpmzDJcPmNqk7aM9C9FADc3Cac61t87qpVkcA723Za42pdrSAPHXqn3FyHmS1K7aH5GaXHNuoZVjk6dNQQFNJkyoBrHYNT2qpJR4JQhtAbmnK39FxiqZUecAYAzg8QpMsTC2FBhkUwH4rZ7c4SuyZTrEswwgc6irwoRZeGNQk5DNTrkG8ey6k4hZFy74Gvg6T2UE1g2LJY46UewL5JGSnykJNYPGj82GUwHzqDSWyaY3fSbDbwaaKrLe7oqJnd4FMGqf56BAMHvgyGrxWnc6bK1hKj7iMeU8MxWcYMKuYs1fEfMtpdTTByoqbZwFXztdofZNSe8LDARUkZwvUKAN3wqa8Qo5Zyj2xUb6VaSvSx1Hf7pn52TpYeewBAT4134mi5SaEHGng5keFg1jwknz4Q52j6WW17c7rR5BapjR",
+              "base58"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
