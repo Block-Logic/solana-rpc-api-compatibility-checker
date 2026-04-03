@@ -25,6 +25,12 @@ The checker currently:
 cargo run
 ```
 
+To run only one RPC method's fixtures:
+
+```bash
+cargo run -- --method getHealth
+```
+
 If the endpoint behaves as expected, the checker prints a passing summary. If a validation fails, the
 process exits with a non-zero status and prints the failure details.
 
