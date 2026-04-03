@@ -1,0 +1,37 @@
+{
+  "name": "getTransaction 39V8tR finalized base58",
+  "method": "getTransaction",
+  "request": {
+    "params": [
+      "39V8tR2Q8Ar3WwMBfVTRPFr7AakLHy5wp7skJNBL7ET6ARoikqc1TaMiuXEtHiNPLQKoeiVr5XnKH8QtjdonN4yM",
+      {
+        "commitment": "finalized",
+        "maxSupportedTransactionVersion": 0,
+        "encoding": "base58"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "transactionSnapshot",
+      "required_result_attributes": ["blockTime", "meta", "slot", "transaction"],
+      "expected_result": {
+        "blockTime": null,
+        "meta": null,
+        "slot": 1,
+        "transaction": [
+          "5q66EyEVQtpBVVjbwYaK7eb62rWiuda7VJrdWxS2CtFH6FnhoTeLfnJ24qG9VWg1tdtFsQNwTVR6VCxHsVHvsdQKaJQyXnxHX4umpNpwyF9HJtuvtxZjduDeV8RaVNz9tMZAE1PLad666brKdePYPytGrp6S4mfC638xzj6nuKXiGXJQAiYKxxsuhMm1D4Rstfg1EsmA9TCFxGetc4s16kWr2EkpY8youWwReQTbkbBpNANLroDHvbCzQGiggrBUDSgmnEMWNA4xmiBWkWKsr3A7NG8CYQZpeSacQSa8reeYUoRxDMEJB4MwQkLSupmPZfq82JYesvy7C7PeM8QjC2JnJTWpXmaenpRemKi6NiGQjPbcVawyW4ygLCKmhaLp2XjSHYaKEe5oC3ykQ55Kk5HCysNFFq89izNjLfTfwqDDExtXkjZohPTcpg7cDafBQb",
+          "base58"
+        ]
+      }
+    }
+  }
+}

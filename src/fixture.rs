@@ -48,6 +48,10 @@ pub enum MethodExpectation {
     EpochInfo {
         required_result_attributes: Vec<String>,
     },
+    TransactionSnapshot {
+        required_result_attributes: Vec<String>,
+        expected_result: serde_json::Value,
+    },
 }
 
 fn default_required_response_attributes() -> Vec<String> {
@@ -134,6 +138,10 @@ mod tests {
             }
             MethodExpectation::EpochInfo {
                 required_result_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::TransactionSnapshot {
+                required_result_attributes: _,
+                expected_result: _,
             } => panic!("expected stringResult validator"),
         }
     }

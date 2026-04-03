@@ -1,0 +1,61 @@
+{
+  "name": "getTransaction 39V8tR finalized json",
+  "method": "getTransaction",
+  "request": {
+    "params": [
+      "39V8tR2Q8Ar3WwMBfVTRPFr7AakLHy5wp7skJNBL7ET6ARoikqc1TaMiuXEtHiNPLQKoeiVr5XnKH8QtjdonN4yM",
+      {
+        "commitment": "finalized",
+        "maxSupportedTransactionVersion": 0,
+        "encoding": "json"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "transactionSnapshot",
+      "required_result_attributes": ["blockTime", "meta", "slot", "transaction"],
+      "expected_result": {
+        "blockTime": null,
+        "meta": null,
+        "slot": 1,
+        "transaction": {
+          "message": {
+            "accountKeys": [
+              "GdnSyH3YtwcxFvQrVVJMm1JhTS4QVX7MFsX56uJLUfiZ",
+              "sCtiJieP8B3SwYnXemiLpRFRR8KJLMtsMVN25fAFWjW",
+              "SysvarS1otHashes111111111111111111111111111",
+              "SysvarC1ock11111111111111111111111111111111",
+              "Vote111111111111111111111111111111111111111"
+            ],
+            "header": {
+              "numReadonlySignedAccounts": 0,
+              "numReadonlyUnsignedAccounts": 3,
+              "numRequiredSignatures": 1
+            },
+            "instructions": [
+              {
+                "accounts": [1, 2, 3, 0],
+                "data": "2ZjTR1vUs2pHXyTLpNez6FPzd1qvueZPaMpuuSaez2ARasvL8JYrcHe1U7SN8nkwgrrKwZ3FoRPVtCSfcqM",
+                "programIdIndex": 4,
+                "stackHeight": 1
+              }
+            ],
+            "recentBlockhash": "4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZAMdL4VZHirAn"
+          },
+          "signatures": [
+            "39V8tR2Q8Ar3WwMBfVTRPFr7AakLHy5wp7skJNBL7ET6ARoikqc1TaMiuXEtHiNPLQKoeiVr5XnKH8QtjdonN4yM"
+          ]
+        }
+      }
+    }
+  }
+}

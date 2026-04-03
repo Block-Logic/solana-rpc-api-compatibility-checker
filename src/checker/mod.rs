@@ -1,9 +1,11 @@
 mod get_epoch_info;
 mod get_health;
+mod get_transaction;
 
 use crate::config::Config;
 use crate::fixture::{MethodExpectation, RpcFixture};
 use anyhow::{Context, Result};
+use reqwest::StatusCode;
 use reqwest::header::CONTENT_TYPE;
 use serde::Serialize;
 use serde_json::Value;
@@ -184,14 +186,8 @@ async fn run_single_check(
         params: &fixture.request.params,
     };
 
-    throttler.wait_for_turn().await;
-    let response = client
-        .post(&config.rpc_endpoint)
-        .header(CONTENT_TYPE, "application/json")
-        .json(&payload)
-        .send()
-        .await
-        .context("RPC request failed")?;
+    let response =
+        send_rpc_request_with_retry(client, throttler, config, fixture, &payload).await?;
 
     let response_data = HttpResponseData {
         status: response.status(),
@@ -207,6 +203,36 @@ async fn run_single_check(
     };
 
     validate_response(fixture, &request_id, &response_data)
+}
+
+async fn send_rpc_request_with_retry(
+    client: &reqwest::Client,
+    throttler: Arc<RequestThrottler>,
+    config: &Config,
+    fixture: &RpcFixture,
+    payload: &JsonRpcRequest<'_>,
+) -> Result<reqwest::Response> {
+    const MAX_ATTEMPTS: usize = 5;
+    const TOO_MANY_REQUESTS_BACKOFF_MS: u64 = 10_000;
+
+    for attempt in 1..=MAX_ATTEMPTS {
+        throttler.wait_for_turn().await;
+        let response = client
+            .post(&config.rpc_endpoint)
+            .header(CONTENT_TYPE, "application/json")
+            .json(payload)
+            .send()
+            .await
+            .with_context(|| format!("RPC request failed for method '{}'", fixture.method))?;
+
+        if response.status() != StatusCode::TOO_MANY_REQUESTS || attempt == MAX_ATTEMPTS {
+            return Ok(response);
+        }
+
+        sleep(Duration::from_millis(TOO_MANY_REQUESTS_BACKOFF_MS)).await;
+    }
+
+    unreachable!("the retry loop always returns a response or error")
 }
 
 fn validate_response(
@@ -317,6 +343,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
     match method {
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),
+        "getTransaction" => Ok(get_transaction::validate),
         other => anyhow::bail!("no validator registered for RPC method '{other}'"),
     }
 }

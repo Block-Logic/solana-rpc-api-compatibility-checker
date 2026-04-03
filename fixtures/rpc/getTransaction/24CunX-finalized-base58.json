@@ -1,0 +1,64 @@
+{
+  "name": "getTransaction 24CunX finalized base58",
+  "method": "getTransaction",
+  "request": {
+    "params": [
+      "24CunXqHzR3dGv69MCASFNDN9rAzEZKeuhrGZUUUa3trPfzq4X4CSrd4aQDpfmzebAfLU5A2xagkEEGrueQvZufi",
+      {
+        "commitment": "finalized",
+        "maxSupportedTransactionVersion": 0,
+        "encoding": "base58"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "transactionSnapshot",
+      "required_result_attributes": ["blockTime", "meta", "slot", "transaction", "version"],
+      "expected_result": {
+        "blockTime": 1775247350,
+        "meta": {
+          "computeUnitsConsumed": 450,
+          "costUnits": 1484,
+          "err": null,
+          "fee": 5006,
+          "innerInstructions": [],
+          "loadedAddresses": {
+            "readonly": [],
+            "writable": []
+          },
+          "logMessages": [
+            "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+            "Program ComputeBudget111111111111111111111111111111 success",
+            "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+            "Program ComputeBudget111111111111111111111111111111 success",
+            "Program 11111111111111111111111111111111 invoke [1]",
+            "Program 11111111111111111111111111111111 success"
+          ],
+          "postBalances": [2920470104, 1, 1],
+          "postTokenBalances": [],
+          "preBalances": [2920475110, 1, 1],
+          "preTokenBalances": [],
+          "rewards": [],
+          "status": {
+            "Ok": null
+          }
+        },
+        "slot": 410822858,
+        "transaction": [
+          "CuyQXLb6ZEJZLoLbYuQfFPo3BRHn9bvZKHNMWUb36dSEbac3Tn7NxD7TJpzjRyijzDgzipYnj1u86Qn9MiLodYTufn6hj3fGEKaHVefqw7x7DDcAwZERsAdetDbH2DoZVUHE3qCJrMXnnwPHJFQ6d9miJ7sha6VRyuvUE2Nton1eQr5MT11pHTpzGPvc7U4G4p4Q9pxXbLfHvZqpNKT1WUUsgySLXa6ud6EeYsh8onaA5z1Z3oEW5xviVwfT8DhvwAkVyz5eAj9V7Mk6jGzjPswWVtjzJxquE12we2MT94rzCAMDJ385mCZuNra4Tcwy",
+          "base58"
+        ],
+        "version": "legacy"
+      }
+    }
+  }
+}
