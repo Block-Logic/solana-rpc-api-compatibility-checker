@@ -14,7 +14,7 @@ The checker currently:
 - loads `.env` with `RPC_ENDPOINT`
 - recursively reads local fixtures from `fixtures/rpc`
 - sends JSON-RPC requests to the configured endpoint
-- enforces a minimum 500 ms delay between requests so the process never exceeds 2 requests/second
+- enforces a minimum 2000 ms delay between requests so the process stays comfortably under 2 requests/second on public RPC endpoints
 - validates the HTTP success status, `Content-Type`, charset, and JSON-RPC envelope
 - dispatches each fixture to a method-specific validator after the shared checks pass
 - starts multi-method runs with `getHealth` and skips later methods if health is not `ok`
@@ -74,6 +74,8 @@ as separate fixtures with different `params`.
 
 - `getHealth`: validates the health string response and is used as the gate for multi-method runs
 - `getEpochInfo`: validates the documented epoch info object for `processed`, `confirmed`, and `finalized` commitments
+- `getTransaction`: validates exact transaction snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
+  Snapshot fixtures can pin `meta` fields and `logMessages` exactly for specific signatures
 
 ## Project layout
 
@@ -82,8 +84,10 @@ as separate fixtures with different `params`.
 - `src/checker/mod.rs`: shared runner, throttling, transport checks, and validator dispatch
 - `src/checker/get_health.rs`: method-specific validation for `getHealth`
 - `src/checker/get_epoch_info.rs`: method-specific validation for `getEpochInfo`
+- `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getEpochInfo/`: commitment-specific fixtures for `getEpochInfo`
+- `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`
 
 ## Next steps
 

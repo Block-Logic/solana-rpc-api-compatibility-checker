@@ -1,0 +1,64 @@
+{
+  "name": "getTransaction 24CunX finalized base64",
+  "method": "getTransaction",
+  "request": {
+    "params": [
+      "24CunXqHzR3dGv69MCASFNDN9rAzEZKeuhrGZUUUa3trPfzq4X4CSrd4aQDpfmzebAfLU5A2xagkEEGrueQvZufi",
+      {
+        "commitment": "finalized",
+        "maxSupportedTransactionVersion": 0,
+        "encoding": "base64"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "transactionSnapshot",
+      "required_result_attributes": ["blockTime", "meta", "slot", "transaction", "version"],
+      "expected_result": {
+        "blockTime": 1775247350,
+        "meta": {
+          "computeUnitsConsumed": 450,
+          "costUnits": 1484,
+          "err": null,
+          "fee": 5006,
+          "innerInstructions": [],
+          "loadedAddresses": {
+            "readonly": [],
+            "writable": []
+          },
+          "logMessages": [
+            "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+            "Program ComputeBudget111111111111111111111111111111 success",
+            "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+            "Program ComputeBudget111111111111111111111111111111 success",
+            "Program 11111111111111111111111111111111 invoke [1]",
+            "Program 11111111111111111111111111111111 success"
+          ],
+          "postBalances": [2920470104, 1, 1],
+          "postTokenBalances": [],
+          "preBalances": [2920475110, 1, 1],
+          "preTokenBalances": [],
+          "rewards": [],
+          "status": {
+            "Ok": null
+          }
+        },
+        "slot": 410822858,
+        "transaction": [
+          "ATTH+pXfss6snekom70i/nU0qyazDa9R2Fbn6mUC2vKnUIsYdnXZ6SMxJZRWi2EZeyovts1c0Y3flN25Kg/X6wUBAAIDDDmMGu67ncaFGHSm+cuGBi+Oq6eIsQmU9iC0IbMhxd4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAAksTmvuJ+hiy/EXTsHEFRdZqCm5vAtu59kNvt4NXPqF8DAgAFAvQBAAACAAkDoSgAAAAAAAABAgAADAIAAACIEwAAAAAAAA==",
+          "base64"
+        ],
+        "version": "legacy"
+      }
+    }
+  }
+}

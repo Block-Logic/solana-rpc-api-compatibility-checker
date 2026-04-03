@@ -1,3 +1,4 @@
+# Mainnet RPC Endpoints only! The fixtures are all for mainnet.
 RPC_ENDPOINT=''
 GRPC_ENDPOINT=''
 GRPC_TOKEN=''

@@ -1,0 +1,94 @@
+{
+  "name": "getTransaction 39V8tR finalized jsonParsed",
+  "method": "getTransaction",
+  "request": {
+    "params": [
+      "39V8tR2Q8Ar3WwMBfVTRPFr7AakLHy5wp7skJNBL7ET6ARoikqc1TaMiuXEtHiNPLQKoeiVr5XnKH8QtjdonN4yM",
+      {
+        "commitment": "finalized",
+        "maxSupportedTransactionVersion": 0,
+        "encoding": "jsonParsed"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "transactionSnapshot",
+      "required_result_attributes": ["blockTime", "meta", "slot", "transaction"],
+      "expected_result": {
+        "blockTime": null,
+        "meta": null,
+        "slot": 1,
+        "transaction": {
+          "message": {
+            "accountKeys": [
+              {
+                "pubkey": "GdnSyH3YtwcxFvQrVVJMm1JhTS4QVX7MFsX56uJLUfiZ",
+                "signer": true,
+                "source": "transaction",
+                "writable": true
+              },
+              {
+                "pubkey": "sCtiJieP8B3SwYnXemiLpRFRR8KJLMtsMVN25fAFWjW",
+                "signer": false,
+                "source": "transaction",
+                "writable": true
+              },
+              {
+                "pubkey": "SysvarS1otHashes111111111111111111111111111",
+                "signer": false,
+                "source": "transaction",
+                "writable": false
+              },
+              {
+                "pubkey": "SysvarC1ock11111111111111111111111111111111",
+                "signer": false,
+                "source": "transaction",
+                "writable": false
+              },
+              {
+                "pubkey": "Vote111111111111111111111111111111111111111",
+                "signer": false,
+                "source": "transaction",
+                "writable": false
+              }
+            ],
+            "instructions": [
+              {
+                "parsed": {
+                  "info": {
+                    "clockSysvar": "SysvarC1ock11111111111111111111111111111111",
+                    "slotHashesSysvar": "SysvarS1otHashes111111111111111111111111111",
+                    "vote": {
+                      "hash": "CWZbL5pkFWdEhdM81CVSx14DzGeGUiBAqWGXQQ7RgTv9",
+                      "slots": [0],
+                      "timestamp": 1584369051
+                    },
+                    "voteAccount": "sCtiJieP8B3SwYnXemiLpRFRR8KJLMtsMVN25fAFWjW",
+                    "voteAuthority": "GdnSyH3YtwcxFvQrVVJMm1JhTS4QVX7MFsX56uJLUfiZ"
+                  },
+                  "type": "vote"
+                },
+                "program": "vote",
+                "programId": "Vote111111111111111111111111111111111111111",
+                "stackHeight": 1
+              }
+            ],
+            "recentBlockhash": "4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZAMdL4VZHirAn"
+          },
+          "signatures": [
+            "39V8tR2Q8Ar3WwMBfVTRPFr7AakLHy5wp7skJNBL7ET6ARoikqc1TaMiuXEtHiNPLQKoeiVr5XnKH8QtjdonN4yM"
+          ]
+        }
+      }
+    }
+  }
+}

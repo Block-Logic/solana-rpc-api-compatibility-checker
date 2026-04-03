@@ -1,0 +1,98 @@
+{
+  "name": "getTransaction 24CunX finalized json",
+  "method": "getTransaction",
+  "request": {
+    "params": [
+      "24CunXqHzR3dGv69MCASFNDN9rAzEZKeuhrGZUUUa3trPfzq4X4CSrd4aQDpfmzebAfLU5A2xagkEEGrueQvZufi",
+      {
+        "commitment": "finalized",
+        "maxSupportedTransactionVersion": 0,
+        "encoding": "json"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "transactionSnapshot",
+      "required_result_attributes": ["blockTime", "meta", "slot", "transaction", "version"],
+      "expected_result": {
+        "blockTime": 1775247350,
+        "meta": {
+          "computeUnitsConsumed": 450,
+          "costUnits": 1484,
+          "err": null,
+          "fee": 5006,
+          "innerInstructions": [],
+          "loadedAddresses": {
+            "readonly": [],
+            "writable": []
+          },
+          "logMessages": [
+            "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+            "Program ComputeBudget111111111111111111111111111111 success",
+            "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+            "Program ComputeBudget111111111111111111111111111111 success",
+            "Program 11111111111111111111111111111111 invoke [1]",
+            "Program 11111111111111111111111111111111 success"
+          ],
+          "postBalances": [2920470104, 1, 1],
+          "postTokenBalances": [],
+          "preBalances": [2920475110, 1, 1],
+          "preTokenBalances": [],
+          "rewards": [],
+          "status": {
+            "Ok": null
+          }
+        },
+        "slot": 410822858,
+        "transaction": {
+          "message": {
+            "accountKeys": [
+              "ping6gwBZx1ccMMFyLgkVSupUmujYrFidEXuNRPq989",
+              "11111111111111111111111111111111",
+              "ComputeBudget111111111111111111111111111111"
+            ],
+            "header": {
+              "numReadonlySignedAccounts": 0,
+              "numReadonlyUnsignedAccounts": 2,
+              "numRequiredSignatures": 1
+            },
+            "instructions": [
+              {
+                "accounts": [],
+                "data": "LKoyXd",
+                "programIdIndex": 2,
+                "stackHeight": 1
+              },
+              {
+                "accounts": [],
+                "data": "3gQyp9iuGYgP",
+                "programIdIndex": 2,
+                "stackHeight": 1
+              },
+              {
+                "accounts": [0, 0],
+                "data": "3Bxs4PckVVt51W8w",
+                "programIdIndex": 1,
+                "stackHeight": 1
+              }
+            ],
+            "recentBlockhash": "AsvfY8NPMh2ase4PNcJGV3yN1UiCjL9RFidzLMg6WUg6"
+          },
+          "signatures": [
+            "24CunXqHzR3dGv69MCASFNDN9rAzEZKeuhrGZUUUa3trPfzq4X4CSrd4aQDpfmzebAfLU5A2xagkEEGrueQvZufi"
+          ]
+        },
+        "version": "legacy"
+      }
+    }
+  }
+}

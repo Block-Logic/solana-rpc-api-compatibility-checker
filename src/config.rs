@@ -15,7 +15,7 @@ impl Config {
 
         Ok(Self {
             rpc_endpoint,
-            minimum_request_interval_ms: 500,
+            minimum_request_interval_ms: 2_000,
         })
     }
 }
