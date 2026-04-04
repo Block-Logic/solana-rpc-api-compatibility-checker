@@ -20,11 +20,15 @@
     },
     "envelope": {
       "jsonrpc_version": "2.0",
-      "required_attributes": ["jsonrpc", "error", "id"],
+      "required_attributes": [
+        "jsonrpc",
+        "error",
+        "id"
+      ],
       "allow_error": true,
       "expected_error": {
-        "code": -32007,
-        "message": "Slot 410842412 was skipped, or missing due to ledger jump to recent snapshot"
+        "code": -32009,
+        "message": "Slot 410842412 was skipped, or missing in long-term storage"
       }
     },
     "validator": {
