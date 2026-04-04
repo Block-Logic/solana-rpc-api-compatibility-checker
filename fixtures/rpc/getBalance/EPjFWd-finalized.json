@@ -1,0 +1,28 @@
+{
+  "name": "getBalance EPjFWd finalized",
+  "method": "getBalance",
+  "request": {
+    "params": [
+      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      {
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "balance",
+      "required_result_attributes": ["context", "value"],
+      "required_context_attributes": ["apiVersion", "slot"],
+      "expected_value": null
+    }
+  }
+}

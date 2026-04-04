@@ -1,8 +1,10 @@
 # solana-rpc-api-compatibility-checker
 Check a Solana RPC endpoint to check conformity with the standard API spec described at https://solana.com/docs/rpc.
 
+Note that I am using Codex for this project. Please validate that all PRs pass tests & all fixtures are valid for 'https://api.mainnet-beta.solana.com' before sending them to me.
+
 Usage:
-`cp dot_env_example.txt .env` then edit .env as desired.
+`cp dot_env_example.txt .env` then edit .env as desired. Review the Run the checker section below for more instructions. 
 
 ## Current scaffold
 
@@ -87,6 +89,7 @@ as separate fixtures with different `params`.
 
 - `getHealth`: validates the health string response and is used as the gate for multi-method runs
 - `getEpochInfo`: validates the documented epoch info object for `processed`, `confirmed`, and `finalized` commitments
+- `getBalance`: validates the documented balance response for finalized commitment and asserts the returned lamport balance is greater than zero
 - `getAccountInfo`: validates structural single-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, `result.value`, and the returned account data shape for the selected encoding
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
@@ -105,6 +108,7 @@ as separate fixtures with different `params`.
 - `src/checker/mod.rs`: shared runner, throttling, transport checks, and validator dispatch
 - `src/checker/get_health.rs`: method-specific validation for `getHealth`
 - `src/checker/get_epoch_info.rs`: method-specific validation for `getEpochInfo`
+- `src/checker/get_balance.rs`: method-specific validation for `getBalance`
 - `src/checker/get_account_info.rs`: method-specific validation for `getAccountInfo`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -112,6 +116,7 @@ as separate fixtures with different `params`.
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getEpochInfo/`: commitment-specific fixtures for `getEpochInfo`
+- `fixtures/rpc/getBalance/`: account-specific fixtures for `getBalance`
 - `fixtures/rpc/getAccountInfo/`: account-specific fixtures for `getAccountInfo`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`

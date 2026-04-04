@@ -56,6 +56,12 @@ pub enum MethodExpectation {
     EpochInfo {
         required_result_attributes: Vec<String>,
     },
+    Balance {
+        required_result_attributes: Vec<String>,
+        required_context_attributes: Vec<String>,
+        #[serde(default)]
+        expected_value: Option<u64>,
+    },
     AccountInfo {
         required_result_attributes: Vec<String>,
         required_context_attributes: Vec<String>,
@@ -185,6 +191,11 @@ mod tests {
             }
             MethodExpectation::EpochInfo {
                 required_result_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::Balance {
+                required_result_attributes: _,
+                required_context_attributes: _,
+                expected_value: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::AccountInfo {
                 required_result_attributes: _,
