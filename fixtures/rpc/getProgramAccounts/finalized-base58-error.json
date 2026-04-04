@@ -1,0 +1,51 @@
+{
+  "name": "getProgramAccounts stake finalized base58 error",
+  "method": "getProgramAccounts",
+  "request": {
+    "params": [
+      "Stake11111111111111111111111111111111111111",
+      {
+        "commitment": "finalized",
+        "encoding": "base58",
+        "filters": [
+          {
+            "memcmp": {
+              "offset": 12,
+              "bytes": "4bZ6o3eUUNXhKuqjdCnCoPAoLgWiuLYixKaxoa8PpiKk"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "error", "id"],
+      "allow_error": true,
+      "expected_error": {
+        "code": -32602,
+        "message": "binary/base58 encoding not supported"
+      }
+    },
+    "validator": {
+      "kind": "programAccounts",
+      "minimum_result_count": 1,
+      "required_result_attributes": ["pubkey", "account"],
+      "required_account_attributes": [
+        "data",
+        "executable",
+        "lamports",
+        "owner",
+        "rentEpoch",
+        "space"
+      ],
+      "expected_owner": "Stake11111111111111111111111111111111111111",
+      "expected_data_encoding": "base64"
+    }
+  }
+}

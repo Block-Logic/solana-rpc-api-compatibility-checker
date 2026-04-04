@@ -1,0 +1,46 @@
+{
+  "name": "getProgramAccounts stake finalized base64+zstd",
+  "method": "getProgramAccounts",
+  "request": {
+    "params": [
+      "Stake11111111111111111111111111111111111111",
+      {
+        "commitment": "finalized",
+        "encoding": "base64+zstd",
+        "filters": [
+          {
+            "memcmp": {
+              "offset": 12,
+              "bytes": "4bZ6o3eUUNXhKuqjdCnCoPAoLgWiuLYixKaxoa8PpiKk"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "programAccounts",
+      "minimum_result_count": 1,
+      "required_result_attributes": ["pubkey", "account"],
+      "required_account_attributes": [
+        "data",
+        "executable",
+        "lamports",
+        "owner",
+        "rentEpoch",
+        "space"
+      ],
+      "expected_owner": "Stake11111111111111111111111111111111111111",
+      "expected_data_encoding": "base64+zstd"
+    }
+  }
+}

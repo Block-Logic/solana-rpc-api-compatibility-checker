@@ -56,6 +56,17 @@ pub enum MethodExpectation {
     EpochInfo {
         required_result_attributes: Vec<String>,
     },
+    ProgramAccounts {
+        minimum_result_count: usize,
+        required_result_attributes: Vec<String>,
+        required_account_attributes: Vec<String>,
+        expected_owner: String,
+        expected_data_encoding: String,
+        #[serde(default)]
+        expected_parsed_program: Option<String>,
+        #[serde(default)]
+        required_parsed_attributes: Vec<String>,
+    },
     TransactionSnapshot {
         required_result_attributes: Vec<String>,
         expected_result: serde_json::Value,
@@ -151,6 +162,15 @@ mod tests {
             }
             MethodExpectation::EpochInfo {
                 required_result_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::ProgramAccounts {
+                minimum_result_count: _,
+                required_result_attributes: _,
+                required_account_attributes: _,
+                expected_owner: _,
+                expected_data_encoding: _,
+                expected_parsed_program: _,
+                required_parsed_attributes: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::TransactionSnapshot {
                 required_result_attributes: _,
