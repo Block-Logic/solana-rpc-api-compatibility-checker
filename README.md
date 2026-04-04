@@ -31,6 +31,12 @@ To run only one RPC method's fixtures:
 cargo run -- --method getHealth
 ```
 
+To print the full RPC response body for any failed validation:
+
+```bash
+cargo run -- --method getProgramAccounts --show-failure-response
+```
+
 If the endpoint behaves as expected, the checker prints a passing summary. If a validation fails, the
 process exits with a non-zero status and prints the failure details.
 
@@ -85,6 +91,8 @@ as separate fixtures with different `params`.
   Snapshot fixtures can pin `meta` fields and `logMessages` exactly for specific signatures
 - `getBlock`: validates exact block snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
   It can also validate expected JSON-RPC errors for skipped or unavailable slots
+- `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
+  The validator asserts account count is greater than zero and checks the shape of each returned account entry
 
 ## Project layout
 
@@ -95,10 +103,12 @@ as separate fixtures with different `params`.
 - `src/checker/get_epoch_info.rs`: method-specific validation for `getEpochInfo`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
 - `src/checker/get_block.rs`: method-specific validation for `getBlock`
+- `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getEpochInfo/`: commitment-specific fixtures for `getEpochInfo`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`
 - `fixtures/rpc/getBlock/`: block-specific fixtures for `getBlock`
+- `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 
 ## Next steps
 

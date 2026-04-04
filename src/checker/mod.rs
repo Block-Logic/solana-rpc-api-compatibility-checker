@@ -1,6 +1,7 @@
 mod get_block;
 mod get_epoch_info;
 mod get_health;
+mod get_program_accounts;
 mod get_transaction;
 
 use crate::config::Config;
@@ -118,6 +119,14 @@ struct HttpResponseData {
 type MethodValidator = fn(&MethodExpectation, &Value) -> Result<String>;
 
 pub async fn run_checks(config: &Config, fixtures: &[RpcFixture]) -> Result<CompatibilityReport> {
+    run_checks_with_options(config, fixtures, false).await
+}
+
+pub async fn run_checks_with_options(
+    config: &Config,
+    fixtures: &[RpcFixture],
+    show_failure_response: bool,
+) -> Result<CompatibilityReport> {
     validate_health_gate_requirements(fixtures)?;
 
     let client = reqwest::Client::builder()
@@ -146,9 +155,15 @@ pub async fn run_checks(config: &Config, fixtures: &[RpcFixture]) -> Result<Comp
             continue;
         }
 
-        let check = run_single_check(&client, throttler.clone(), config, fixture)
-            .await
-            .with_context(|| format!("fixture '{}'", fixture.name));
+        let check = run_single_check(
+            &client,
+            throttler.clone(),
+            config,
+            fixture,
+            show_failure_response,
+        )
+        .await
+        .with_context(|| format!("fixture '{}'", fixture.name));
 
         match check {
             Ok(details) => checks.push(CheckOutcome {
@@ -178,6 +193,7 @@ async fn run_single_check(
     throttler: Arc<RequestThrottler>,
     config: &Config,
     fixture: &RpcFixture,
+    show_failure_response: bool,
 ) -> Result<String> {
     let request_id = fixture.name.clone();
     let payload = JsonRpcRequest {
@@ -203,7 +219,14 @@ async fn run_single_check(
             .context("failed to read response body")?,
     };
 
-    validate_response(fixture, &request_id, &response_data)
+    match validate_response(fixture, &request_id, &response_data) {
+        Ok(details) => Ok(details),
+        Err(error) if show_failure_response => Err(error).context(format!(
+            "full RPC response body: {}",
+            response_data.body_text
+        )),
+        Err(error) => Err(error),
+    }
 }
 
 async fn send_rpc_request_with_retry(
@@ -336,11 +359,9 @@ fn validate_expected_error(
     error: &Value,
     expected_error: Option<&JsonRpcErrorExpectation>,
 ) -> Result<String> {
-    let expected_error =
-        expected_error.context("fixture allowed JSON-RPC errors but did not define expected_error")?;
-    let error_object = error
-        .as_object()
-        .context("error field was not an object")?;
+    let expected_error = expected_error
+        .context("fixture allowed JSON-RPC errors but did not define expected_error")?;
+    let error_object = error.as_object().context("error field was not an object")?;
 
     let actual_code = error_object
         .get("code")
@@ -393,6 +414,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getBlock" => Ok(get_block::validate),
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),
+        "getProgramAccounts" => Ok(get_program_accounts::validate),
         "getTransaction" => Ok(get_transaction::validate),
         other => anyhow::bail!("no validator registered for RPC method '{other}'"),
     }
@@ -572,8 +594,8 @@ mod tests {
             body_text: r#"{"jsonrpc":"2.0","error":{"code":-32007,"message":"actual message"},"id":"getBlock skipped slot"}"#.to_string(),
         };
 
-        let error =
-            validate_response(&fixture, "getBlock skipped slot", &response).expect_err("should fail");
+        let error = validate_response(&fixture, "getBlock skipped slot", &response)
+            .expect_err("should fail");
 
         assert!(
             error
@@ -641,14 +663,14 @@ mod tests {
                     },
                     envelope: JsonRpcEnvelopeExpectation {
                         jsonrpc_version: "2.0".to_string(),
-                    required_attributes: vec![
-                        "jsonrpc".to_string(),
-                        "result".to_string(),
-                        "id".to_string(),
-                    ],
-                    allow_error: false,
-                    expected_error: None,
-                },
+                        required_attributes: vec![
+                            "jsonrpc".to_string(),
+                            "result".to_string(),
+                            "id".to_string(),
+                        ],
+                        allow_error: false,
+                        expected_error: None,
+                    },
                     validator: MethodExpectation::EpochInfo {
                         required_result_attributes: vec![
                             "absoluteSlot".to_string(),
@@ -672,14 +694,14 @@ mod tests {
                     },
                     envelope: JsonRpcEnvelopeExpectation {
                         jsonrpc_version: "2.0".to_string(),
-                    required_attributes: vec![
-                        "jsonrpc".to_string(),
-                        "result".to_string(),
-                        "id".to_string(),
-                    ],
-                    allow_error: false,
-                    expected_error: None,
-                },
+                        required_attributes: vec![
+                            "jsonrpc".to_string(),
+                            "result".to_string(),
+                            "id".to_string(),
+                        ],
+                        allow_error: false,
+                        expected_error: None,
+                    },
                     validator: MethodExpectation::EpochInfo {
                         required_result_attributes: vec![
                             "absoluteSlot".to_string(),

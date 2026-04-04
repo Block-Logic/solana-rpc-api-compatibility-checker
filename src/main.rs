@@ -3,13 +3,14 @@ mod config;
 mod fixture;
 
 use anyhow::Result;
-use checker::run_checks;
+use checker::{run_checks, run_checks_with_options};
 use config::Config;
 use fixture::{RpcFixture, load_rpc_fixtures};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct CliArgs {
     method: Option<String>,
+    show_failure_response: bool,
 }
 
 impl CliArgs {
@@ -19,6 +20,7 @@ impl CliArgs {
 
     fn parse_from(args: impl IntoIterator<Item = String>) -> Result<Self> {
         let mut method = None;
+        let mut show_failure_response = false;
         let mut args = args.into_iter();
 
         while let Some(arg) = args.next() {
@@ -29,6 +31,9 @@ impl CliArgs {
                         .ok_or_else(|| anyhow::anyhow!("--method requires a value"))?;
                     method = Some(value);
                 }
+                "--show-failure-response" => {
+                    show_failure_response = true;
+                }
                 "--help" | "-h" => {
                     print_usage();
                     std::process::exit(0);
@@ -37,7 +42,10 @@ impl CliArgs {
             }
         }
 
-        Ok(Self { method })
+        Ok(Self {
+            method,
+            show_failure_response,
+        })
     }
 }
 
@@ -45,13 +53,20 @@ impl CliArgs {
 async fn main() -> Result<()> {
     let cli_args = CliArgs::parse()?;
     let config = Config::from_env()?;
-    let fixtures = select_fixtures(load_rpc_fixtures("fixtures/rpc")?, cli_args.method.as_deref())?;
+    let fixtures = select_fixtures(
+        load_rpc_fixtures("fixtures/rpc")?,
+        cli_args.method.as_deref(),
+    )?;
 
     if fixtures.is_empty() {
         anyhow::bail!("no RPC fixtures were found in fixtures/rpc");
     }
 
-    let report = run_checks(&config, &fixtures).await?;
+    let report = if cli_args.show_failure_response {
+        run_checks_with_options(&config, &fixtures, true).await?
+    } else {
+        run_checks(&config, &fixtures).await?
+    };
     report.print_summary();
 
     if report.has_failures() {
@@ -79,7 +94,7 @@ fn select_fixtures(fixtures: Vec<RpcFixture>, method: Option<&str>) -> Result<Ve
 }
 
 fn print_usage() {
-    println!("Usage: cargo run -- [--method <rpc-method>]");
+    println!("Usage: cargo run -- [--method <rpc-method>] [--show-failure-response]");
 }
 
 #[cfg(test)]
@@ -94,7 +109,26 @@ mod tests {
         assert_eq!(
             args,
             CliArgs {
-                method: Some("getBlock".to_string())
+                method: Some("getBlock".to_string()),
+                show_failure_response: false,
+            }
+        );
+    }
+
+    #[test]
+    fn parses_show_failure_response_flag() {
+        let args = CliArgs::parse_from(vec![
+            "--method".to_string(),
+            "getProgramAccounts".to_string(),
+            "--show-failure-response".to_string(),
+        ])
+        .expect("expected parse success");
+
+        assert_eq!(
+            args,
+            CliArgs {
+                method: Some("getProgramAccounts".to_string()),
+                show_failure_response: true,
             }
         );
     }
