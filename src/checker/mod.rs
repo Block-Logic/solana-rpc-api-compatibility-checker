@@ -1,6 +1,7 @@
 mod get_account_info;
 mod get_balance;
 mod get_block;
+mod get_block_commitment;
 mod get_block_height;
 mod get_epoch_info;
 mod get_health;
@@ -418,6 +419,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getAccountInfo" => Ok(get_account_info::validate),
         "getBalance" => Ok(get_balance::validate),
         "getBlock" => Ok(get_block::validate),
+        "getBlockCommitment" => Ok(get_block_commitment::validate),
         "getBlockHeight" => Ok(get_block_height::validate),
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),

@@ -90,6 +90,7 @@ as separate fixtures with different `params`.
 - `getHealth`: validates the health string response and is used as the gate for multi-method runs
 - `getEpochInfo`: validates the documented epoch info object for `processed`, `confirmed`, and `finalized` commitments
 - `getBalance`: validates the documented balance response for finalized commitment and asserts the returned lamport balance is greater than zero
+- `getBlockCommitment`: validates exact block commitment snapshots for stable slots such as `2`
 - `getBlockHeight`: validates the documented finalized block height response and asserts the returned value is greater than zero
 - `getAccountInfo`: validates structural single-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, `result.value`, and the returned account data shape for the selected encoding
@@ -110,6 +111,7 @@ as separate fixtures with different `params`.
 - `src/checker/get_health.rs`: method-specific validation for `getHealth`
 - `src/checker/get_epoch_info.rs`: method-specific validation for `getEpochInfo`
 - `src/checker/get_balance.rs`: method-specific validation for `getBalance`
+- `src/checker/get_block_commitment.rs`: method-specific validation for `getBlockCommitment`
 - `src/checker/get_block_height.rs`: method-specific validation for `getBlockHeight`
 - `src/checker/get_account_info.rs`: method-specific validation for `getAccountInfo`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
@@ -119,6 +121,7 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getEpochInfo/`: commitment-specific fixtures for `getEpochInfo`
 - `fixtures/rpc/getBalance/`: account-specific fixtures for `getBalance`
+- `fixtures/rpc/getBlockCommitment/`: block-specific fixtures for `getBlockCommitment`
 - `fixtures/rpc/getBlockHeight/`: finalized fixtures for `getBlockHeight`
 - `fixtures/rpc/getAccountInfo/`: account-specific fixtures for `getAccountInfo`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
