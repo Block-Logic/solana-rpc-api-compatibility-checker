@@ -7,6 +7,7 @@ mod get_block_production;
 mod get_block_time;
 mod get_blocks;
 mod get_blocks_with_limit;
+mod get_cluster_nodes;
 mod get_epoch_info;
 mod get_health;
 mod get_multiple_accounts;
@@ -429,6 +430,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getBlockProduction" => Ok(get_block_production::validate),
         "getBlocks" => Ok(get_blocks::validate),
         "getBlocksWithLimit" => Ok(get_blocks_with_limit::validate),
+        "getClusterNodes" => Ok(get_cluster_nodes::validate),
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),
         "getMultipleAccounts" => Ok(get_multiple_accounts::validate),

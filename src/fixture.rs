@@ -73,6 +73,13 @@ pub enum MethodExpectation {
         required_range_attributes: Vec<String>,
         expected_identity: String,
     },
+    ClusterNodes {
+        minimum_result_count: usize,
+        required_node_attributes: Vec<String>,
+        required_string_attributes: Vec<String>,
+        nullable_string_attributes: Vec<String>,
+        required_u64_attributes: Vec<String>,
+    },
     BlockHeight,
     EpochInfo {
         required_result_attributes: Vec<String>,
@@ -229,6 +236,13 @@ mod tests {
                 required_value_attributes: _,
                 required_range_attributes: _,
                 expected_identity: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::ClusterNodes {
+                minimum_result_count: _,
+                required_node_attributes: _,
+                required_string_attributes: _,
+                nullable_string_attributes: _,
+                required_u64_attributes: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::BlockHeight => panic!("expected stringResult validator"),
             MethodExpectation::EpochInfo {

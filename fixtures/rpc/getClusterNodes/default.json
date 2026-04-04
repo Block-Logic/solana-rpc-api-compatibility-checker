@@ -1,0 +1,61 @@
+{
+  "name": "getClusterNodes default",
+  "method": "getClusterNodes",
+  "request": {
+    "params": []
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "clusterNodes",
+      "minimum_result_count": 1,
+      "required_node_attributes": [
+        "featureSet",
+        "gossip",
+        "pubkey",
+        "pubsub",
+        "rpc",
+        "serveRepair",
+        "shredVersion",
+        "tpu",
+        "tpuForwards",
+        "tpuForwardsQuic",
+        "tpuQuic",
+        "tpuVote",
+        "tvu",
+        "version"
+      ],
+      "required_string_attributes": [
+        "gossip",
+        "pubkey",
+        "serveRepair",
+        "tpu",
+        "tpuForwards",
+        "tpuForwardsQuic",
+        "tpuQuic",
+        "tpuVote",
+        "tvu",
+        "version"
+      ],
+      "nullable_string_attributes": [
+        "pubsub",
+        "rpc"
+      ],
+      "required_u64_attributes": [
+        "featureSet",
+        "shredVersion"
+      ]
+    }
+  }
+}
