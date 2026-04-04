@@ -1,0 +1,43 @@
+{
+  "name": "getAccountInfo EPjFWd finalized base58",
+  "method": "getAccountInfo",
+  "request": {
+    "params": [
+      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      {
+        "commitment": "finalized",
+        "encoding": "base58"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "accountInfo",
+      "required_result_attributes": ["context", "value"],
+      "required_context_attributes": ["apiVersion", "slot"],
+      "required_value_attributes": [
+        "data",
+        "executable",
+        "lamports",
+        "owner",
+        "rentEpoch",
+        "space"
+      ],
+      "expected_value_attributes": {
+        "executable": false,
+        "rentEpoch": 18446744073709551615,
+        "space": 82
+      },
+      "expected_owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "expected_data_encoding": "base58"
+    }
+  }
+}

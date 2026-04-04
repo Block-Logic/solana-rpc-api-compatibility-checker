@@ -87,6 +87,8 @@ as separate fixtures with different `params`.
 
 - `getHealth`: validates the health string response and is used as the gate for multi-method runs
 - `getEpochInfo`: validates the documented epoch info object for `processed`, `confirmed`, and `finalized` commitments
+- `getAccountInfo`: validates structural single-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
+  The validator checks `result.context`, `result.value`, and the returned account data shape for the selected encoding
 - `getTransaction`: validates exact transaction snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
   Snapshot fixtures can pin `meta` fields and `logMessages` exactly for specific signatures
 - `getBlock`: validates exact block snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
@@ -101,11 +103,13 @@ as separate fixtures with different `params`.
 - `src/checker/mod.rs`: shared runner, throttling, transport checks, and validator dispatch
 - `src/checker/get_health.rs`: method-specific validation for `getHealth`
 - `src/checker/get_epoch_info.rs`: method-specific validation for `getEpochInfo`
+- `src/checker/get_account_info.rs`: method-specific validation for `getAccountInfo`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
 - `src/checker/get_block.rs`: method-specific validation for `getBlock`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getEpochInfo/`: commitment-specific fixtures for `getEpochInfo`
+- `fixtures/rpc/getAccountInfo/`: account-specific fixtures for `getAccountInfo`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`
 - `fixtures/rpc/getBlock/`: block-specific fixtures for `getBlock`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`

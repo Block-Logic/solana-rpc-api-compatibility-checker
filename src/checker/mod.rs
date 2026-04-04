@@ -1,3 +1,4 @@
+mod get_account_info;
 mod get_block;
 mod get_epoch_info;
 mod get_health;
@@ -411,6 +412,7 @@ fn validate_charset(content_type: &str, expected_charset: &str) -> Result<()> {
 
 fn validator_for_method(method: &str) -> Result<MethodValidator> {
     match method {
+        "getAccountInfo" => Ok(get_account_info::validate),
         "getBlock" => Ok(get_block::validate),
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),
