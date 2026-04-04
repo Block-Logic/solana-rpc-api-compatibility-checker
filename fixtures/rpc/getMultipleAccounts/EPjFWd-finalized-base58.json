@@ -1,9 +1,12 @@
 {
-  "name": "getAccountInfo EPjFWd finalized base58",
-  "method": "getAccountInfo",
+  "name": "getMultipleAccounts EPjFWd finalized base58",
+  "method": "getMultipleAccounts",
   "request": {
     "params": [
-      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      [
+        "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+      ],
       {
         "commitment": "finalized",
         "encoding": "base58"
@@ -20,7 +23,7 @@
       "required_attributes": ["jsonrpc", "result", "id"]
     },
     "validator": {
-      "kind": "accountInfo",
+      "kind": "multipleAccounts",
       "required_result_attributes": ["context", "value"],
       "required_context_attributes": ["apiVersion", "slot"],
       "required_value_attributes": [
@@ -31,11 +34,18 @@
         "rentEpoch",
         "space"
       ],
-      "expected_value_attributes": {
-        "executable": false,
-        "space": 82
-      },
-      "expected_owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "expected_value_attributes": [
+        {
+          "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "space": 82
+        },
+        {
+          "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "space": 82
+        }
+      ],
       "expected_data_encoding": "base58"
     }
   }

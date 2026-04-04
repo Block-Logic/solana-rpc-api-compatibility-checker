@@ -2,6 +2,7 @@ mod get_account_info;
 mod get_block;
 mod get_epoch_info;
 mod get_health;
+mod get_multiple_accounts;
 mod get_program_accounts;
 mod get_transaction;
 
@@ -416,6 +417,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getBlock" => Ok(get_block::validate),
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),
+        "getMultipleAccounts" => Ok(get_multiple_accounts::validate),
         "getProgramAccounts" => Ok(get_program_accounts::validate),
         "getTransaction" => Ok(get_transaction::validate),
         other => anyhow::bail!("no validator registered for RPC method '{other}'"),
