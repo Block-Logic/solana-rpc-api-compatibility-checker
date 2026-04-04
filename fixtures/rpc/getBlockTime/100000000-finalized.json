@@ -1,0 +1,27 @@
+{
+  "name": "getBlockTime 100000000 finalized",
+  "method": "getBlockTime",
+  "request": {
+    "params": [
+      100000000
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "blockTime",
+      "expected_value": 1633504705
+    }
+  }
+}

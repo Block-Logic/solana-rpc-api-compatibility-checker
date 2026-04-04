@@ -92,6 +92,7 @@ as separate fixtures with different `params`.
 - `getBalance`: validates the documented balance response for finalized commitment and asserts the returned lamport balance is greater than zero
 - `getBlockCommitment`: validates exact block commitment snapshots for stable slots such as `2`
 - `getBlockHeight`: validates the documented finalized block height response and asserts the returned value is greater than zero
+- `getBlockTime`: validates exact stable block-time values for fixed finalized slots such as `100000000`
 - `getBlockProduction`: validates the finalized block production response shape for a specific validator identity without pinning the changing counters
 - `getBlocks`: validates exact stable slot-list snapshots for fixed finalized ranges such as `2..10`
 - `getBlocksWithLimit`: validates exact stable slot-list snapshots for fixed finalized start/limit queries such as `2` with limit `10`
@@ -116,6 +117,7 @@ as separate fixtures with different `params`.
 - `src/checker/get_balance.rs`: method-specific validation for `getBalance`
 - `src/checker/get_block_commitment.rs`: method-specific validation for `getBlockCommitment`
 - `src/checker/get_block_height.rs`: method-specific validation for `getBlockHeight`
+- `src/checker/get_block_time.rs`: method-specific validation for `getBlockTime`
 - `src/checker/get_block_production.rs`: method-specific validation for `getBlockProduction`
 - `src/checker/get_blocks.rs`: method-specific validation for `getBlocks`
 - `src/checker/get_blocks_with_limit.rs`: method-specific validation for `getBlocksWithLimit`
@@ -129,6 +131,7 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getBalance/`: account-specific fixtures for `getBalance`
 - `fixtures/rpc/getBlockCommitment/`: block-specific fixtures for `getBlockCommitment`
 - `fixtures/rpc/getBlockHeight/`: finalized fixtures for `getBlockHeight`
+- `fixtures/rpc/getBlockTime/`: slot-specific fixtures for `getBlockTime`
 - `fixtures/rpc/getBlockProduction/`: identity-specific fixtures for `getBlockProduction`
 - `fixtures/rpc/getBlocks/`: finalized range fixtures for `getBlocks`
 - `fixtures/rpc/getBlocksWithLimit/`: finalized start-and-limit fixtures for `getBlocksWithLimit`
@@ -146,3 +149,4 @@ RPC methods should mostly require:
 1. adding fixture files under `fixtures/rpc/<method>/`
 2. registering a validator for the method
 3. teaching that validator how to interpret `expectation.validator`
+4. Expand test coverage with more examples, especially error cases to confirm the correct error codes are received.
