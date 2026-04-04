@@ -94,6 +94,7 @@ as separate fixtures with different `params`.
 - `getBlockHeight`: validates the documented finalized block height response and asserts the returned value is greater than zero
 - `getBlockProduction`: validates the finalized block production response shape for a specific validator identity without pinning the changing counters
 - `getBlocks`: validates exact stable slot-list snapshots for fixed finalized ranges such as `2..10`
+- `getBlocksWithLimit`: validates exact stable slot-list snapshots for fixed finalized start/limit queries such as `2` with limit `10`
 - `getAccountInfo`: validates structural single-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, `result.value`, and the returned account data shape for the selected encoding
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
@@ -117,6 +118,7 @@ as separate fixtures with different `params`.
 - `src/checker/get_block_height.rs`: method-specific validation for `getBlockHeight`
 - `src/checker/get_block_production.rs`: method-specific validation for `getBlockProduction`
 - `src/checker/get_blocks.rs`: method-specific validation for `getBlocks`
+- `src/checker/get_blocks_with_limit.rs`: method-specific validation for `getBlocksWithLimit`
 - `src/checker/get_account_info.rs`: method-specific validation for `getAccountInfo`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -129,6 +131,7 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getBlockHeight/`: finalized fixtures for `getBlockHeight`
 - `fixtures/rpc/getBlockProduction/`: identity-specific fixtures for `getBlockProduction`
 - `fixtures/rpc/getBlocks/`: finalized range fixtures for `getBlocks`
+- `fixtures/rpc/getBlocksWithLimit/`: finalized start-and-limit fixtures for `getBlocksWithLimit`
 - `fixtures/rpc/getAccountInfo/`: account-specific fixtures for `getAccountInfo`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`

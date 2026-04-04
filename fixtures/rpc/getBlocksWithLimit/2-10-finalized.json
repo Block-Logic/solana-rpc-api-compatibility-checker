@@ -1,0 +1,42 @@
+{
+  "name": "getBlocksWithLimit 2-10 finalized",
+  "method": "getBlocksWithLimit",
+  "request": {
+    "params": [
+      2,
+      10,
+      {
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "blocksWithLimitSnapshot",
+      "expected_result": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    }
+  }
+}
