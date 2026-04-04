@@ -1,0 +1,28 @@
+{
+  "name": "getBalance M9c1Rr finalized zero",
+  "method": "getBalance",
+  "request": {
+    "params": [
+      "M9c1RrrygDYVB2s2tsbTweSeszRUrfBpVTHJVb8gQAj",
+      {
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "balance",
+      "required_result_attributes": ["context", "value"],
+      "required_context_attributes": ["apiVersion", "slot"],
+      "expected_value": 0
+    }
+  }
+}
