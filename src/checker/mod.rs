@@ -4,6 +4,7 @@ mod get_block;
 mod get_block_commitment;
 mod get_block_height;
 mod get_block_production;
+mod get_block_time;
 mod get_blocks;
 mod get_blocks_with_limit;
 mod get_epoch_info;
@@ -424,6 +425,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getBlock" => Ok(get_block::validate),
         "getBlockCommitment" => Ok(get_block_commitment::validate),
         "getBlockHeight" => Ok(get_block_height::validate),
+        "getBlockTime" => Ok(get_block_time::validate),
         "getBlockProduction" => Ok(get_block_production::validate),
         "getBlocks" => Ok(get_blocks::validate),
         "getBlocksWithLimit" => Ok(get_blocks_with_limit::validate),
