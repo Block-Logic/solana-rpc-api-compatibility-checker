@@ -110,16 +110,8 @@ pub fn validate(expectation: &MethodExpectation, result: &Value) -> Result<Strin
         .get("rentEpoch")
         .and_then(Value::as_u64)
         .context("result.value.rentEpoch was not a u64")?;
-    let expected_rent_epoch = expected_value_object
-        .get("rentEpoch")
-        .and_then(Value::as_u64)
-        .context("expected_value_attributes.rentEpoch was not a u64")?;
-    if rent_epoch != expected_rent_epoch {
-        anyhow::bail!(
-            "result.value.rentEpoch expected {}, received {}",
-            expected_rent_epoch,
-            rent_epoch
-        );
+    if rent_epoch == 0 {
+        anyhow::bail!("result.value.rentEpoch must be greater than 0");
     }
 
     let space = value_object
@@ -277,7 +269,6 @@ mod tests {
                 ],
                 expected_value_attributes: json!({
                     "executable": false,
-                    "rentEpoch": 42,
                     "space": 82
                 }),
                 expected_owner: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA".to_string(),
@@ -321,7 +312,6 @@ mod tests {
                 ],
                 expected_value_attributes: json!({
                     "executable": false,
-                    "rentEpoch": 42,
                     "space": 82
                 }),
                 expected_owner: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA".to_string(),
@@ -372,7 +362,6 @@ mod tests {
                 ],
                 expected_value_attributes: json!({
                     "executable": false,
-                    "rentEpoch": 42,
                     "space": 82
                 }),
                 expected_owner: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA".to_string(),

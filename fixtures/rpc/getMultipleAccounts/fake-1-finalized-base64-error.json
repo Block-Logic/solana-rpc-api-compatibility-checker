@@ -1,0 +1,57 @@
+{
+  "name": "getMultipleAccounts fake-1 finalized base64 error",
+  "method": "getMultipleAccounts",
+  "request": {
+    "params": [
+      [
+        "fake-1",
+        "fake-2"
+      ],
+      {
+        "commitment": "finalized",
+        "encoding": "base64"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "error", "id"],
+      "allow_error": true,
+      "expected_error": {
+        "code": -32602,
+        "message": "Invalid param: Invalid"
+      }
+    },
+    "validator": {
+      "kind": "multipleAccounts",
+      "required_result_attributes": ["context", "value"],
+      "required_context_attributes": ["apiVersion", "slot"],
+      "required_value_attributes": [
+        "data",
+        "executable",
+        "lamports",
+        "owner",
+        "rentEpoch",
+        "space"
+      ],
+      "expected_value_attributes": [
+        {
+          "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "space": 82
+        },
+        {
+          "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "space": 82
+        }
+      ],
+      "expected_data_encoding": "base64"
+    }
+  }
+}
