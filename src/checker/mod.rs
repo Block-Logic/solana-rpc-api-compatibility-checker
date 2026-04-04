@@ -4,6 +4,7 @@ mod get_block;
 mod get_block_commitment;
 mod get_block_height;
 mod get_block_production;
+mod get_blocks;
 mod get_epoch_info;
 mod get_health;
 mod get_multiple_accounts;
@@ -423,6 +424,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getBlockCommitment" => Ok(get_block_commitment::validate),
         "getBlockHeight" => Ok(get_block_height::validate),
         "getBlockProduction" => Ok(get_block_production::validate),
+        "getBlocks" => Ok(get_blocks::validate),
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getHealth" => Ok(get_health::validate),
         "getMultipleAccounts" => Ok(get_multiple_accounts::validate),
