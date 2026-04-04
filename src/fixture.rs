@@ -57,6 +57,13 @@ pub enum MethodExpectation {
         required_result_attributes: Vec<String>,
         expected_result: serde_json::Value,
     },
+    BlockProduction {
+        required_result_attributes: Vec<String>,
+        required_context_attributes: Vec<String>,
+        required_value_attributes: Vec<String>,
+        required_range_attributes: Vec<String>,
+        expected_identity: String,
+    },
     BlockHeight,
     EpochInfo {
         required_result_attributes: Vec<String>,
@@ -197,6 +204,13 @@ mod tests {
             MethodExpectation::BlockCommitment {
                 required_result_attributes: _,
                 expected_result: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::BlockProduction {
+                required_result_attributes: _,
+                required_context_attributes: _,
+                required_value_attributes: _,
+                required_range_attributes: _,
+                expected_identity: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::BlockHeight => panic!("expected stringResult validator"),
             MethodExpectation::EpochInfo {

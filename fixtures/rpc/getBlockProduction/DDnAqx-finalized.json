@@ -1,0 +1,46 @@
+{
+  "name": "getBlockProduction DDnAqx finalized",
+  "method": "getBlockProduction",
+  "request": {
+    "params": [
+      {
+        "identity": "DDnAqxJVFo2GVTujibHt5cjevHMSE9bo8HJaydHoshdp",
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "blockProduction",
+      "required_result_attributes": [
+        "context",
+        "value"
+      ],
+      "required_context_attributes": [
+        "apiVersion",
+        "slot"
+      ],
+      "required_value_attributes": [
+        "byIdentity",
+        "range"
+      ],
+      "required_range_attributes": [
+        "firstSlot",
+        "lastSlot"
+      ],
+      "expected_identity": "DDnAqxJVFo2GVTujibHt5cjevHMSE9bo8HJaydHoshdp"
+    }
+  }
+}
