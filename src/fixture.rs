@@ -53,6 +53,7 @@ pub enum MethodExpectation {
     StringResult {
         allowed_values: Vec<String>,
     },
+    BlockHeight,
     EpochInfo {
         required_result_attributes: Vec<String>,
     },
@@ -189,6 +190,7 @@ mod tests {
             MethodExpectation::StringResult { allowed_values } => {
                 assert_eq!(allowed_values, vec!["ok"]);
             }
+            MethodExpectation::BlockHeight => panic!("expected stringResult validator"),
             MethodExpectation::EpochInfo {
                 required_result_attributes: _,
             } => panic!("expected stringResult validator"),
