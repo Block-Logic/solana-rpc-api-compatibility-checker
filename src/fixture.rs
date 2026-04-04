@@ -57,6 +57,9 @@ pub enum MethodExpectation {
         required_result_attributes: Vec<String>,
         expected_result: serde_json::Value,
     },
+    BlocksSnapshot {
+        expected_result: serde_json::Value,
+    },
     BlockProduction {
         required_result_attributes: Vec<String>,
         required_context_attributes: Vec<String>,
@@ -205,6 +208,9 @@ mod tests {
                 required_result_attributes: _,
                 expected_result: _,
             } => panic!("expected stringResult validator"),
+            MethodExpectation::BlocksSnapshot { expected_result: _ } => {
+                panic!("expected stringResult validator")
+            }
             MethodExpectation::BlockProduction {
                 required_result_attributes: _,
                 required_context_attributes: _,
