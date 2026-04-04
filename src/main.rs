@@ -53,6 +53,7 @@ impl CliArgs {
 async fn main() -> Result<()> {
     let cli_args = CliArgs::parse()?;
     let config = Config::from_env()?;
+    println!("Running against RPC_ENDPOINT={}", config.rpc_endpoint);
     let fixtures = select_fixtures(
         load_rpc_fixtures("fixtures/rpc")?,
         cli_args.method.as_deref(),
