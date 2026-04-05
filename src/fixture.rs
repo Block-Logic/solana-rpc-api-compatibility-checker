@@ -87,6 +87,10 @@ pub enum MethodExpectation {
     EpochSchedule {
         required_result_attributes: Vec<String>,
     },
+    FeeForMessage {
+        required_result_attributes: Vec<String>,
+        required_context_attributes: Vec<String>,
+    },
     Balance {
         required_result_attributes: Vec<String>,
         required_context_attributes: Vec<String>,
@@ -253,6 +257,10 @@ mod tests {
             } => panic!("expected stringResult validator"),
             MethodExpectation::EpochSchedule {
                 required_result_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::FeeForMessage {
+                required_result_attributes: _,
+                required_context_attributes: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::Balance {
                 required_result_attributes: _,
