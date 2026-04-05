@@ -29,6 +29,7 @@ use serde::Serialize;
 use serde_json::Value;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
+use std::io::IsTerminal;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::{Duration, Instant, sleep};
@@ -48,9 +49,9 @@ impl CompatibilityReport {
     pub fn print_summary(&self) {
         for check in &self.checks {
             let status = match check.status {
-                CheckStatus::Passed => "PASS",
-                CheckStatus::Failed => "FAIL",
-                CheckStatus::Skipped => "SKIP",
+                CheckStatus::Passed => colorize_status_label("PASS", AnsiColor::Green),
+                CheckStatus::Failed => colorize_status_label("FAIL", AnsiColor::Red),
+                CheckStatus::Skipped => "SKIP".to_string(),
             };
             println!("[{status}] {} - {}", check.fixture_name, check.details);
         }
@@ -73,6 +74,25 @@ impl CompatibilityReport {
         println!();
         println!("Summary: {passed} passed, {failed} failed, {skipped} skipped");
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+enum AnsiColor {
+    Green,
+    Red,
+}
+
+fn colorize_status_label(label: &str, color: AnsiColor) -> String {
+    if !std::io::stdout().is_terminal() || std::env::var_os("NO_COLOR").is_some() {
+        return label.to_string();
+    }
+
+    let color_code = match color {
+        AnsiColor::Green => 32,
+        AnsiColor::Red => 31,
+    };
+
+    format!("\x1b[{color_code}m{label}\x1b[0m")
 }
 
 #[derive(Debug)]
