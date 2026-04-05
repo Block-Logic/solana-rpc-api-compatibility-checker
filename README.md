@@ -87,77 +87,77 @@ as separate fixtures with different `params`.
 
 ## Current methods
 
-- `getHealth`: validates the health string response and is used as the gate for multi-method runs
+- `getAccountInfo`: validates structural single-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
+  The validator checks `result.context`, `result.value`, and the returned account data shape for the selected encoding
+- `getBalance`: validates the documented balance response for finalized commitment and asserts the returned lamport balance is greater than zero
+- `getBlock`: validates exact block snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
+  It can also validate expected JSON-RPC errors for skipped or unavailable slots
+- `getBlockCommitment`: validates exact block commitment snapshots for stable slots such as `2`
+- `getBlockHeight`: validates the documented finalized block height response and asserts the returned value is greater than zero
+- `getBlockProduction`: validates the finalized block production response shape for a specific validator identity without pinning the changing counters
+- `getBlocks`: validates exact stable slot-list snapshots for fixed finalized ranges such as `2..10`
+- `getBlocksWithLimit`: validates exact stable slot-list snapshots for fixed finalized start/limit queries such as `2` with limit `10`
+- `getBlockTime`: validates exact stable block-time values for fixed finalized slots such as `100000000`
+- `getClusterNodes`: validates the dynamic cluster-nodes response shape and checks the first node entry has the documented fields and value types
 - `getEpochInfo`: validates the documented epoch info object for `processed`, `confirmed`, and `finalized` commitments
 - `getEpochSchedule`: validates the documented epoch schedule object shape without pinning cluster-specific values
 - `getFeeForMessage`: validates the full response shape for a base64 message, including `context` and a `value` that may be either `u64` or `null`
 - `getFirstAvailableBlock`: validates the full JSON-RPC response shape and pins the returned first available block to `0`
 - `getGenesisHash`: validates the full JSON-RPC response shape and checks that the returned genesis hash is a non-empty string
+- `getHealth`: validates the health string response and is used as the gate for multi-method runs
 - `getHighestSnapshotSlot`: validates the full JSON-RPC response shape for snapshot metadata, including `full` and an `incremental` value that may be `u64` or `null`
-- `getBalance`: validates the documented balance response for finalized commitment and asserts the returned lamport balance is greater than zero
-- `getBlockCommitment`: validates exact block commitment snapshots for stable slots such as `2`
-- `getBlockHeight`: validates the documented finalized block height response and asserts the returned value is greater than zero
-- `getBlockTime`: validates exact stable block-time values for fixed finalized slots such as `100000000`
-- `getBlockProduction`: validates the finalized block production response shape for a specific validator identity without pinning the changing counters
-- `getBlocks`: validates exact stable slot-list snapshots for fixed finalized ranges such as `2..10`
-- `getBlocksWithLimit`: validates exact stable slot-list snapshots for fixed finalized start/limit queries such as `2` with limit `10`
-- `getClusterNodes`: validates the dynamic cluster-nodes response shape and checks the first node entry has the documented fields and value types
-- `getAccountInfo`: validates structural single-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
-  The validator checks `result.context`, `result.value`, and the returned account data shape for the selected encoding
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
-- `getTransaction`: validates exact transaction snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
-  Snapshot fixtures can pin `meta` fields and `logMessages` exactly for specific signatures
-- `getBlock`: validates exact block snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
-  It can also validate expected JSON-RPC errors for skipped or unavailable slots
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
   The validator asserts account count is greater than zero and checks the shape of each returned account entry
+- `getTransaction`: validates exact transaction snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
+  Snapshot fixtures can pin `meta` fields and `logMessages` exactly for specific signatures
 
 ## Project layout
 
 - `src/config.rs`: loads environment configuration
 - `src/fixture.rs`: parses recursive, method-agnostic RPC fixtures
 - `src/checker/mod.rs`: shared runner, throttling, transport checks, and validator dispatch
-- `src/checker/get_health.rs`: method-specific validation for `getHealth`
+- `src/checker/get_account_info.rs`: method-specific validation for `getAccountInfo`
+- `src/checker/get_balance.rs`: method-specific validation for `getBalance`
+- `src/checker/get_block.rs`: method-specific validation for `getBlock`
+- `src/checker/get_block_commitment.rs`: method-specific validation for `getBlockCommitment`
+- `src/checker/get_block_height.rs`: method-specific validation for `getBlockHeight`
+- `src/checker/get_block_production.rs`: method-specific validation for `getBlockProduction`
+- `src/checker/get_blocks.rs`: method-specific validation for `getBlocks`
+- `src/checker/get_blocks_with_limit.rs`: method-specific validation for `getBlocksWithLimit`
+- `src/checker/get_block_time.rs`: method-specific validation for `getBlockTime`
+- `src/checker/get_cluster_nodes.rs`: method-specific validation for `getClusterNodes`
 - `src/checker/get_epoch_info.rs`: method-specific validation for `getEpochInfo`
 - `src/checker/get_epoch_schedule.rs`: method-specific validation for `getEpochSchedule`
 - `src/checker/get_fee_for_message.rs`: method-specific validation for `getFeeForMessage`
 - `src/checker/get_first_available_block.rs`: method-specific validation for `getFirstAvailableBlock`
 - `src/checker/get_genesis_hash.rs`: method-specific validation for `getGenesisHash`
+- `src/checker/get_health.rs`: method-specific validation for `getHealth`
 - `src/checker/get_highest_snapshot_slot.rs`: method-specific validation for `getHighestSnapshotSlot`
-- `src/checker/get_balance.rs`: method-specific validation for `getBalance`
-- `src/checker/get_block_commitment.rs`: method-specific validation for `getBlockCommitment`
-- `src/checker/get_block_height.rs`: method-specific validation for `getBlockHeight`
-- `src/checker/get_block_time.rs`: method-specific validation for `getBlockTime`
-- `src/checker/get_block_production.rs`: method-specific validation for `getBlockProduction`
-- `src/checker/get_blocks.rs`: method-specific validation for `getBlocks`
-- `src/checker/get_blocks_with_limit.rs`: method-specific validation for `getBlocksWithLimit`
-- `src/checker/get_cluster_nodes.rs`: method-specific validation for `getClusterNodes`
-- `src/checker/get_account_info.rs`: method-specific validation for `getAccountInfo`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
-- `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
-- `src/checker/get_block.rs`: method-specific validation for `getBlock`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
-- `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
+- `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
+- `fixtures/rpc/getAccountInfo/`: account-specific fixtures for `getAccountInfo`
+- `fixtures/rpc/getBalance/`: account-specific fixtures for `getBalance`
+- `fixtures/rpc/getBlock/`: block-specific fixtures for `getBlock`
+- `fixtures/rpc/getBlockCommitment/`: block-specific fixtures for `getBlockCommitment`
+- `fixtures/rpc/getBlockHeight/`: finalized fixtures for `getBlockHeight`
+- `fixtures/rpc/getBlockProduction/`: identity-specific fixtures for `getBlockProduction`
+- `fixtures/rpc/getBlocks/`: finalized range fixtures for `getBlocks`
+- `fixtures/rpc/getBlocksWithLimit/`: finalized start-and-limit fixtures for `getBlocksWithLimit`
+- `fixtures/rpc/getBlockTime/`: slot-specific fixtures for `getBlockTime`
+- `fixtures/rpc/getClusterNodes/`: structural fixtures for `getClusterNodes`
 - `fixtures/rpc/getEpochInfo/`: commitment-specific fixtures for `getEpochInfo`
 - `fixtures/rpc/getEpochSchedule/`: structural fixtures for `getEpochSchedule`
 - `fixtures/rpc/getFeeForMessage/`: message-specific fixtures for `getFeeForMessage`
 - `fixtures/rpc/getFirstAvailableBlock/`: exact-value fixtures for `getFirstAvailableBlock`
 - `fixtures/rpc/getGenesisHash/`: structural fixtures for `getGenesisHash`
+- `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getHighestSnapshotSlot/`: structural fixtures for `getHighestSnapshotSlot`
-- `fixtures/rpc/getBalance/`: account-specific fixtures for `getBalance`
-- `fixtures/rpc/getBlockCommitment/`: block-specific fixtures for `getBlockCommitment`
-- `fixtures/rpc/getBlockHeight/`: finalized fixtures for `getBlockHeight`
-- `fixtures/rpc/getBlockTime/`: slot-specific fixtures for `getBlockTime`
-- `fixtures/rpc/getBlockProduction/`: identity-specific fixtures for `getBlockProduction`
-- `fixtures/rpc/getBlocks/`: finalized range fixtures for `getBlocks`
-- `fixtures/rpc/getBlocksWithLimit/`: finalized start-and-limit fixtures for `getBlocksWithLimit`
-- `fixtures/rpc/getClusterNodes/`: structural fixtures for `getClusterNodes`
-- `fixtures/rpc/getAccountInfo/`: account-specific fixtures for `getAccountInfo`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
-- `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`
-- `fixtures/rpc/getBlock/`: block-specific fixtures for `getBlock`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
+- `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`
 
 ## Next steps
 
