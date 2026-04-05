@@ -110,6 +110,9 @@ as separate fixtures with different `params`.
 - `getInflationGovernor`: validates the finalized inflation-governor response shape and exact stable content snapshot
 - `getInflationRate`: validates the full inflation-rate response shape without pinning the dynamic values
 - `getInflationReward`: validates the finalized inflation-reward response shape for a provided address, allowing each array entry to be either `null` or a reward object
+- `getLargestAccounts`: validates the full largest-accounts response shape, and the current mainnet fixture pins the observed allowed-error response for the public endpoint
+- `getLeaderSchedule`: validates the finalized leader-schedule response shape as a validator-identity map whose values are arrays of slot indices
+- `getLatestBlockhash`: validates the finalized latest-blockhash response shape, including `context` and `value`, without pinning dynamic values
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
@@ -143,6 +146,9 @@ as separate fixtures with different `params`.
 - `src/checker/get_inflation_governor.rs`: method-specific validation for `getInflationGovernor`
 - `src/checker/get_inflation_rate.rs`: method-specific validation for `getInflationRate`
 - `src/checker/get_inflation_reward.rs`: method-specific validation for `getInflationReward`
+- `src/checker/get_largest_accounts.rs`: method-specific validation for `getLargestAccounts`
+- `src/checker/get_leader_schedule.rs`: method-specific validation for `getLeaderSchedule`
+- `src/checker/get_latest_blockhash.rs`: method-specific validation for `getLatestBlockhash`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -167,6 +173,9 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getInflationGovernor/`: finalized snapshot fixtures for `getInflationGovernor`
 - `fixtures/rpc/getInflationRate/`: structural fixtures for `getInflationRate`
 - `fixtures/rpc/getInflationReward/`: finalized structural fixtures for `getInflationReward`
+- `fixtures/rpc/getLargestAccounts/`: finalized fixtures for `getLargestAccounts`
+- `fixtures/rpc/getLeaderSchedule/`: finalized structural fixtures for `getLeaderSchedule`
+- `fixtures/rpc/getLatestBlockhash/`: finalized structural fixtures for `getLatestBlockhash`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`
