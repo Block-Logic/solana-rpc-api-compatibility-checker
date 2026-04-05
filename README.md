@@ -85,7 +85,7 @@ Each fixture now represents one concrete RPC scenario. That maps more cleanly to
 parameter in the request object. Methods that need multiple encoding-style scenarios can express them
 as separate fixtures with different `params`.
 
-## Current methods
+## Current Methods
 
 - `getAccountInfo`: validates structural single-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, `result.value`, and the returned account data shape for the selected encoding
@@ -117,7 +117,7 @@ as separate fixtures with different `params`.
 - `getTransaction`: validates exact transaction snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
   Snapshot fixtures can pin `meta` fields and `logMessages` exactly for specific signatures
 
-## Project layout
+## Project Layout
 
 - `src/config.rs`: loads environment configuration
 - `src/fixture.rs`: parses recursive, method-agnostic RPC fixtures

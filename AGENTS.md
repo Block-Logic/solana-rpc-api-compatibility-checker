@@ -109,6 +109,7 @@ Running against RPC_ENDPOINT=...
 - Add unit tests for new validator behavior.
 - Prefer extending existing patterns over inventing a separate framework.
 - If live RPC behavior has drifted, refresh fixtures from live responses rather than weakening validation without reason.
+- After adding a new validator for an RPC method, update the "Current Methods" and "Project Layout" sections of README.md, and sort the methods in alphabetical order.
 
 ## Done criteria
 
