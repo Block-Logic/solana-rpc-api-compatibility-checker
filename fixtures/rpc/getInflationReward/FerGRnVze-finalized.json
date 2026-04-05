@@ -1,0 +1,38 @@
+{
+  "name": "getInflationReward FerGRnVze finalized",
+  "method": "getInflationReward",
+  "request": {
+    "params": [
+      [
+        "FerGRnVze8BM8FcGiRqCjGDvtMp7SJrjtdkzxzW2VzCd"
+      ],
+      {
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "inflationReward",
+      "expected_result_length": 1,
+      "required_reward_attributes": [
+        "epoch",
+        "effectiveSlot",
+        "amount",
+        "postBalance"
+      ]
+    }
+  }
+}

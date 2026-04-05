@@ -107,6 +107,9 @@ as separate fixtures with different `params`.
 - `getHealth`: validates the health string response and is used as the gate for multi-method runs
 - `getHighestSnapshotSlot`: validates the full JSON-RPC response shape for snapshot metadata, including `full` and an `incremental` value that may be `u64` or `null`
 - `getIdentity`: validates the full JSON-RPC response shape and checks that the returned `identity` field is a non-empty string
+- `getInflationGovernor`: validates the finalized inflation-governor response shape and exact stable content snapshot
+- `getInflationRate`: validates the full inflation-rate response shape without pinning the dynamic values
+- `getInflationReward`: validates the finalized inflation-reward response shape for a provided address, allowing each array entry to be either `null` or a reward object
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
@@ -137,6 +140,9 @@ as separate fixtures with different `params`.
 - `src/checker/get_health.rs`: method-specific validation for `getHealth`
 - `src/checker/get_highest_snapshot_slot.rs`: method-specific validation for `getHighestSnapshotSlot`
 - `src/checker/get_identity.rs`: method-specific validation for `getIdentity`
+- `src/checker/get_inflation_governor.rs`: method-specific validation for `getInflationGovernor`
+- `src/checker/get_inflation_rate.rs`: method-specific validation for `getInflationRate`
+- `src/checker/get_inflation_reward.rs`: method-specific validation for `getInflationReward`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -158,6 +164,9 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getHighestSnapshotSlot/`: structural fixtures for `getHighestSnapshotSlot`
 - `fixtures/rpc/getIdentity/`: structural fixtures for `getIdentity`
+- `fixtures/rpc/getInflationGovernor/`: finalized snapshot fixtures for `getInflationGovernor`
+- `fixtures/rpc/getInflationRate/`: structural fixtures for `getInflationRate`
+- `fixtures/rpc/getInflationReward/`: finalized structural fixtures for `getInflationReward`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`

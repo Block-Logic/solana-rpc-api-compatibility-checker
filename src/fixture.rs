@@ -98,6 +98,17 @@ pub enum MethodExpectation {
     Identity {
         required_result_attributes: Vec<String>,
     },
+    InflationGovernor {
+        required_result_attributes: Vec<String>,
+        expected_result: serde_json::Value,
+    },
+    InflationRate {
+        required_result_attributes: Vec<String>,
+    },
+    InflationReward {
+        expected_result_length: usize,
+        required_reward_attributes: Vec<String>,
+    },
     HighestSnapshotSlot {
         required_result_attributes: Vec<String>,
     },
@@ -278,6 +289,17 @@ mod tests {
             MethodExpectation::GenesisHash => panic!("expected stringResult validator"),
             MethodExpectation::Identity {
                 required_result_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::InflationGovernor {
+                required_result_attributes: _,
+                expected_result: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::InflationRate {
+                required_result_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::InflationReward {
+                expected_result_length: _,
+                required_reward_attributes: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::HighestSnapshotSlot {
                 required_result_attributes: _,

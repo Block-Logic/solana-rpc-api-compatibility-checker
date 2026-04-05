@@ -1,0 +1,38 @@
+{
+  "name": "getInflationReward 9GJmEHGom finalized",
+  "method": "getInflationReward",
+  "request": {
+    "params": [
+      [
+        "9GJmEHGom9eWo4np4L5vC6b6ri1Df2xN8KFoWixvD1Bs"
+      ],
+      {
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "inflationReward",
+      "expected_result_length": 1,
+      "required_reward_attributes": [
+        "epoch",
+        "effectiveSlot",
+        "amount",
+        "postBalance"
+      ]
+    }
+  }
+}

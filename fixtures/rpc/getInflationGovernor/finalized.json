@@ -1,0 +1,42 @@
+{
+  "name": "getInflationGovernor finalized",
+  "method": "getInflationGovernor",
+  "request": {
+    "params": [
+      {
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "inflationGovernor",
+      "required_result_attributes": [
+        "foundation",
+        "foundationTerm",
+        "initial",
+        "taper",
+        "terminal"
+      ],
+      "expected_result": {
+        "foundation": 0.0,
+        "foundationTerm": 0.0,
+        "initial": 0.08,
+        "taper": 0.15,
+        "terminal": 0.015
+      }
+    }
+  }
+}
