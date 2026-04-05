@@ -106,6 +106,7 @@ as separate fixtures with different `params`.
 - `getGenesisHash`: validates the full JSON-RPC response shape and checks that the returned genesis hash is a non-empty string
 - `getHealth`: validates the health string response and is used as the gate for multi-method runs
 - `getHighestSnapshotSlot`: validates the full JSON-RPC response shape for snapshot metadata, including `full` and an `incremental` value that may be `u64` or `null`
+- `getIdentity`: validates the full JSON-RPC response shape and checks that the returned `identity` field is a non-empty string
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
@@ -135,6 +136,7 @@ as separate fixtures with different `params`.
 - `src/checker/get_genesis_hash.rs`: method-specific validation for `getGenesisHash`
 - `src/checker/get_health.rs`: method-specific validation for `getHealth`
 - `src/checker/get_highest_snapshot_slot.rs`: method-specific validation for `getHighestSnapshotSlot`
+- `src/checker/get_identity.rs`: method-specific validation for `getIdentity`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -155,6 +157,7 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getGenesisHash/`: structural fixtures for `getGenesisHash`
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getHighestSnapshotSlot/`: structural fixtures for `getHighestSnapshotSlot`
+- `fixtures/rpc/getIdentity/`: structural fixtures for `getIdentity`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`
