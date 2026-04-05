@@ -19,6 +19,9 @@ mod get_identity;
 mod get_inflation_governor;
 mod get_inflation_rate;
 mod get_inflation_reward;
+mod get_largest_accounts;
+mod get_latest_blockhash;
+mod get_leader_schedule;
 mod get_multiple_accounts;
 mod get_program_accounts;
 mod get_transaction;
@@ -288,6 +291,12 @@ async fn send_rpc_request_with_retry(
             .await
             .with_context(|| format!("RPC request failed for method '{}'", fixture.method))?;
 
+        if fixture.expectation.envelope.allow_error
+            && response.status() == StatusCode::TOO_MANY_REQUESTS
+        {
+            return Ok(response);
+        }
+
         if response.status() != StatusCode::TOO_MANY_REQUESTS || attempt == MAX_ATTEMPTS {
             return Ok(response);
         }
@@ -303,7 +312,10 @@ fn validate_response(
     request_id: &str,
     response: &HttpResponseData,
 ) -> Result<String> {
-    if !response.status.is_success() {
+    let allows_rate_limit_error = fixture.expectation.envelope.allow_error
+        && response.status == StatusCode::TOO_MANY_REQUESTS;
+
+    if !response.status.is_success() && !allows_rate_limit_error {
         anyhow::bail!(
             "expected an HTTP success status, received {}",
             response.status
@@ -329,7 +341,9 @@ fn validate_response(
         );
     }
 
-    validate_charset(content_type, &fixture.expectation.transport.charset)?;
+    if !(allows_rate_limit_error && !content_type.to_ascii_lowercase().contains("charset=")) {
+        validate_charset(content_type, &fixture.expectation.transport.charset)?;
+    }
 
     let document: Value =
         serde_json::from_str(&response.body_text).context("response body was not valid JSON")?;
@@ -470,6 +484,9 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getInflationGovernor" => Ok(get_inflation_governor::validate),
         "getInflationRate" => Ok(get_inflation_rate::validate),
         "getInflationReward" => Ok(get_inflation_reward::validate),
+        "getLargestAccounts" => Ok(get_largest_accounts::validate),
+        "getLeaderSchedule" => Ok(get_leader_schedule::validate),
+        "getLatestBlockhash" => Ok(get_latest_blockhash::validate),
         "getHealth" => Ok(get_health::validate),
         "getMultipleAccounts" => Ok(get_multiple_accounts::validate),
         "getProgramAccounts" => Ok(get_program_accounts::validate),
@@ -625,6 +642,66 @@ mod tests {
         };
 
         let result = validate_response(&fixture, "getBlock skipped slot", &response);
+
+        assert!(result.is_ok(), "expected validation to pass: {result:?}");
+    }
+
+    #[test]
+    fn validates_expected_json_rpc_error_response_with_http_429() {
+        let mut fixture = fixture();
+        fixture.name = "getLargestAccounts finalized error".to_string();
+        fixture.method = "getLargestAccounts".to_string();
+        fixture.expectation.envelope.required_attributes =
+            vec!["jsonrpc".to_string(), "error".to_string(), "id".to_string()];
+        fixture.expectation.envelope.allow_error = true;
+        fixture.expectation.envelope.expected_error = Some(JsonRpcErrorExpectation {
+            code: 429,
+            message: "Too many requests for a specific RPC call".to_string(),
+        });
+        fixture.expectation.validator = MethodExpectation::LargestAccounts {
+            minimum_result_count: 1,
+            required_result_attributes: vec!["context".to_string(), "value".to_string()],
+            required_context_attributes: vec!["slot".to_string()],
+            required_value_attributes: vec!["address".to_string(), "lamports".to_string()],
+        };
+
+        let response = HttpResponseData {
+            status: reqwest::StatusCode::TOO_MANY_REQUESTS,
+            content_type: Some("application/json; charset=utf-8".to_string()),
+            body_text: r#"{"jsonrpc":"2.0","error":{"code":429,"message":"Too many requests for a specific RPC call"},"id":"getLargestAccounts finalized error"}"#.to_string(),
+        };
+
+        let result = validate_response(&fixture, "getLargestAccounts finalized error", &response);
+
+        assert!(result.is_ok(), "expected validation to pass: {result:?}");
+    }
+
+    #[test]
+    fn validates_expected_json_rpc_error_response_with_http_429_and_no_charset() {
+        let mut fixture = fixture();
+        fixture.name = "getLargestAccounts finalized error".to_string();
+        fixture.method = "getLargestAccounts".to_string();
+        fixture.expectation.envelope.required_attributes =
+            vec!["jsonrpc".to_string(), "error".to_string(), "id".to_string()];
+        fixture.expectation.envelope.allow_error = true;
+        fixture.expectation.envelope.expected_error = Some(JsonRpcErrorExpectation {
+            code: 429,
+            message: "Too many requests for a specific RPC call".to_string(),
+        });
+        fixture.expectation.validator = MethodExpectation::LargestAccounts {
+            minimum_result_count: 1,
+            required_result_attributes: vec!["context".to_string(), "value".to_string()],
+            required_context_attributes: vec!["slot".to_string()],
+            required_value_attributes: vec!["address".to_string(), "lamports".to_string()],
+        };
+
+        let response = HttpResponseData {
+            status: reqwest::StatusCode::TOO_MANY_REQUESTS,
+            content_type: Some("application/json".to_string()),
+            body_text: r#"{"jsonrpc":"2.0","error":{"code":429,"message":"Too many requests for a specific RPC call"},"id":"getLargestAccounts finalized error"}"#.to_string(),
+        };
+
+        let result = validate_response(&fixture, "getLargestAccounts finalized error", &response);
 
         assert!(result.is_ok(), "expected validation to pass: {result:?}");
     }

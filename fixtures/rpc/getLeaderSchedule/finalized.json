@@ -1,0 +1,26 @@
+{
+  "name": "getLeaderSchedule finalized",
+  "method": "getLeaderSchedule",
+  "request": {
+    "params": [
+      null,
+      {
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "leaderSchedule",
+      "minimum_validator_count": 1
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "getLargestAccounts finalized error",
+  "method": "getLargestAccounts",
+  "request": {
+    "params": [
+      {
+        "commitment": "finalized"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "error",
+        "id"
+      ],
+      "allow_error": true,
+      "expected_error": {
+        "code": 429,
+        "message": "Too many requests for a specific RPC call"
+      }
+    },
+    "validator": {
+      "kind": "largestAccounts",
+      "minimum_result_count": 1,
+      "required_result_attributes": [
+        "context",
+        "value"
+      ],
+      "required_context_attributes": [
+        "slot"
+      ],
+      "required_value_attributes": [
+        "address",
+        "lamports"
+      ]
+    }
+  }
+}

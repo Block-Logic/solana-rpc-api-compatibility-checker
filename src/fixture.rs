@@ -109,8 +109,22 @@ pub enum MethodExpectation {
         expected_result_length: usize,
         required_reward_attributes: Vec<String>,
     },
+    LargestAccounts {
+        minimum_result_count: usize,
+        required_result_attributes: Vec<String>,
+        required_context_attributes: Vec<String>,
+        required_value_attributes: Vec<String>,
+    },
+    LeaderSchedule {
+        minimum_validator_count: usize,
+    },
     HighestSnapshotSlot {
         required_result_attributes: Vec<String>,
+    },
+    LatestBlockhash {
+        required_result_attributes: Vec<String>,
+        required_context_attributes: Vec<String>,
+        required_value_attributes: Vec<String>,
     },
     Balance {
         required_result_attributes: Vec<String>,
@@ -301,8 +315,22 @@ mod tests {
                 expected_result_length: _,
                 required_reward_attributes: _,
             } => panic!("expected stringResult validator"),
+            MethodExpectation::LargestAccounts {
+                minimum_result_count: _,
+                required_result_attributes: _,
+                required_context_attributes: _,
+                required_value_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::LeaderSchedule {
+                minimum_validator_count: _,
+            } => panic!("expected stringResult validator"),
             MethodExpectation::HighestSnapshotSlot {
                 required_result_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::LatestBlockhash {
+                required_result_attributes: _,
+                required_context_attributes: _,
+                required_value_attributes: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::Balance {
                 required_result_attributes: _,
