@@ -42,6 +42,8 @@ cargo run -- --method getProgramAccounts --show-failure-response
 If the endpoint behaves as expected, the checker prints a passing summary. If a validation fails, the
 process exits with a non-zero status and prints the failure details.
 
+When running in an interactive terminal, the CLI also shows a spinner while checks are in flight.
+
 ## Fixture format
 
 Each fixture file is a local JSON document that describes one RPC method scenario. The initial

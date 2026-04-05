@@ -6,6 +6,13 @@ use anyhow::Result;
 use checker::{run_checks, run_checks_with_options};
 use config::Config;
 use fixture::{RpcFixture, load_rpc_fixtures};
+use std::io::{IsTerminal, Write};
+use std::sync::{
+    Arc,
+    atomic::{AtomicBool, Ordering},
+};
+use tokio::task::JoinHandle;
+use tokio::time::{Duration, sleep};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct CliArgs {
@@ -63,11 +70,14 @@ async fn main() -> Result<()> {
         anyhow::bail!("no RPC fixtures were found in fixtures/rpc");
     }
 
-    let report = if cli_args.show_failure_response {
-        run_checks_with_options(&config, &fixtures, true).await?
+    let spinner = Spinner::start("Running compatibility checks");
+    let report_result = if cli_args.show_failure_response {
+        run_checks_with_options(&config, &fixtures, true).await
     } else {
-        run_checks(&config, &fixtures).await?
+        run_checks(&config, &fixtures).await
     };
+    spinner.stop().await;
+    let report = report_result?;
     report.print_summary();
 
     if report.has_failures() {
@@ -96,6 +106,61 @@ fn select_fixtures(fixtures: Vec<RpcFixture>, method: Option<&str>) -> Result<Ve
 
 fn print_usage() {
     println!("Usage: cargo run -- [--method <rpc-method>] [--show-failure-response]");
+}
+
+struct Spinner {
+    is_enabled: bool,
+    is_done: Arc<AtomicBool>,
+    handle: Option<JoinHandle<()>>,
+}
+
+impl Spinner {
+    fn start(message: &'static str) -> Self {
+        let is_enabled = std::io::stderr().is_terminal() && std::env::var_os("NO_COLOR").is_none();
+
+        if !is_enabled {
+            return Self {
+                is_enabled,
+                is_done: Arc::new(AtomicBool::new(true)),
+                handle: None,
+            };
+        }
+
+        let is_done = Arc::new(AtomicBool::new(false));
+        let done_signal = Arc::clone(&is_done);
+        let handle = tokio::spawn(async move {
+            const FRAMES: [&str; 4] = ["|", "/", "-", "\\"];
+            let mut frame_index = 0usize;
+
+            while !done_signal.load(Ordering::Relaxed) {
+                eprint!("\r{} {}", FRAMES[frame_index], message);
+                let _ = std::io::stderr().flush();
+                frame_index = (frame_index + 1) % FRAMES.len();
+                sleep(Duration::from_millis(100)).await;
+            }
+        });
+
+        Self {
+            is_enabled,
+            is_done,
+            handle: Some(handle),
+        }
+    }
+
+    async fn stop(mut self) {
+        if !self.is_enabled {
+            return;
+        }
+
+        self.is_done.store(true, Ordering::Relaxed);
+
+        if let Some(handle) = self.handle.take() {
+            let _ = handle.await;
+        }
+
+        eprint!("\r\x1b[2K");
+        let _ = std::io::stderr().flush();
+    }
 }
 
 #[cfg(test)]
