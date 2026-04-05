@@ -55,7 +55,7 @@ pub enum MethodExpectation {
     },
     BlockCommitment {
         required_result_attributes: Vec<String>,
-        expected_result: serde_json::Value,
+        expected_commitment: serde_json::Value,
     },
     BlockTime {
         expected_value: u64,
@@ -261,7 +261,7 @@ mod tests {
             }
             MethodExpectation::BlockCommitment {
                 required_result_attributes: _,
-                expected_result: _,
+                expected_commitment: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::BlockTime { expected_value: _ } => {
                 panic!("expected stringResult validator")

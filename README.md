@@ -92,7 +92,7 @@ as separate fixtures with different `params`.
 - `getBalance`: validates the documented balance response for finalized commitment and asserts the returned lamport balance is greater than zero
 - `getBlock`: validates exact block snapshots for supported response formats such as `json`, `jsonParsed`, `base64`, and `base58`
   It can also validate expected JSON-RPC errors for skipped or unavailable slots
-- `getBlockCommitment`: validates exact block commitment snapshots for stable slots such as `2`
+- `getBlockCommitment`: validates the stable block commitment shape for fixed slots such as `2`, while allowing `totalStake` to drift
 - `getBlockHeight`: validates the documented finalized block height response and asserts the returned value is greater than zero
 - `getBlockProduction`: validates the finalized block production response shape for a specific validator identity without pinning the changing counters
 - `getBlocks`: validates exact stable slot-list snapshots for fixed finalized ranges such as `2..10`

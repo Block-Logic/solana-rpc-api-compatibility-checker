@@ -3,11 +3,11 @@ use anyhow::{Context, Result};
 use serde_json::Value;
 
 pub fn validate(expectation: &MethodExpectation, result: &Value) -> Result<String> {
-    let (required_result_attributes, expected_result) = match expectation {
+    let (required_result_attributes, expected_commitment) = match expectation {
         MethodExpectation::BlockCommitment {
             required_result_attributes,
-            expected_result,
-        } => (required_result_attributes, expected_result),
+            expected_commitment,
+        } => (required_result_attributes, expected_commitment),
         other => anyhow::bail!(
             "getBlockCommitment expected a blockCommitment validator, received {other:?}"
         ),
@@ -19,14 +19,18 @@ pub fn validate(expectation: &MethodExpectation, result: &Value) -> Result<Strin
 
     assert_required_result_attributes(result_object, required_result_attributes)?;
 
-    if result != expected_result {
-        anyhow::bail!("result payload did not match the expected block commitment snapshot");
-    }
-
     let commitment_summary = match result_object.get("commitment") {
-        Some(Value::Array(values)) => values.len().to_string(),
-        Some(Value::Null) => "null".to_string(),
-        _ => anyhow::bail!("result field 'commitment' was neither null nor an array"),
+        Some(value) if value == expected_commitment => match value {
+            Value::Array(values) => values.len().to_string(),
+            Value::Null => "null".to_string(),
+            _ => anyhow::bail!("result field 'commitment' was neither null nor an array"),
+        },
+        Some(actual) => anyhow::bail!(
+            "result field 'commitment' did not match expected value: expected {}, received {}",
+            expected_commitment,
+            actual
+        ),
+        None => anyhow::bail!("result object was missing required 'commitment' field"),
     };
     let total_stake = result_object
         .get("totalStake")
@@ -70,7 +74,7 @@ mod tests {
                     "commitment".to_string(),
                     "totalStake".to_string(),
                 ],
-                expected_result: expected_result.clone(),
+                expected_commitment: serde_json::Value::Null,
             },
             &expected_result,
         )
@@ -80,29 +84,26 @@ mod tests {
     }
 
     #[test]
-    fn rejects_block_commitment_snapshot_mismatch() {
+    fn rejects_block_commitment_shape_mismatch() {
         let error = validate(
             &MethodExpectation::BlockCommitment {
                 required_result_attributes: vec![
                     "commitment".to_string(),
                     "totalStake".to_string(),
                 ],
-                expected_result: json!({
-                    "commitment": null,
-                    "totalStake": 42
-                }),
+                expected_commitment: serde_json::Value::Null,
             },
             &json!({
                 "commitment": [1, 2, 3],
                 "totalStake": 42
             }),
         )
-        .expect_err("mismatched snapshot should fail");
+        .expect_err("mismatched commitment shape should fail");
 
         assert!(
             error
                 .to_string()
-                .contains("result payload did not match the expected block commitment snapshot")
+                .contains("result field 'commitment' did not match expected value")
         );
     }
 }
