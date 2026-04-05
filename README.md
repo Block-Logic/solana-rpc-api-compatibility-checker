@@ -118,6 +118,8 @@ as separate fixtures with different `params`.
 - `getMaxRetransmitSlot`: validates the dynamic max retransmit slot response shape and asserts the returned slot is greater than zero
 - `getMaxShredInsertSlot`: validates the dynamic max shred insert slot response shape and asserts the returned slot is greater than zero
 - `getMinimumBalanceForRentExemption`: validates the exact processed rent-exemption minimum for a fixed size such as `100`
+- `getRecentPerformanceSamples`: validates the full response shape for a dynamic recent-performance-samples array without pinning the returned values
+- `getRecentPrioritizationFees`: validates the full response shape for a dynamic recent-prioritization-fees array without pinning the returned values
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
@@ -157,6 +159,8 @@ as separate fixtures with different `params`.
 - `src/checker/get_max_retransmit_slot.rs`: method-specific validation for `getMaxRetransmitSlot`
 - `src/checker/get_max_shred_insert_slot.rs`: method-specific validation for `getMaxShredInsertSlot`
 - `src/checker/get_minimum_balance_for_rent_exemption.rs`: method-specific validation for `getMinimumBalanceForRentExemption`
+- `src/checker/get_recent_performance_samples.rs`: method-specific validation for `getRecentPerformanceSamples`
+- `src/checker/get_recent_prioritization_fees.rs`: method-specific validation for `getRecentPrioritizationFees`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -187,6 +191,8 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getMaxRetransmitSlot/`: shape fixtures for `getMaxRetransmitSlot`
 - `fixtures/rpc/getMaxShredInsertSlot/`: shape fixtures for `getMaxShredInsertSlot`
 - `fixtures/rpc/getMinimumBalanceForRentExemption/`: exact-value fixtures for `getMinimumBalanceForRentExemption`
+- `fixtures/rpc/getRecentPerformanceSamples/`: structural fixtures for `getRecentPerformanceSamples`
+- `fixtures/rpc/getRecentPrioritizationFees/`: structural fixtures for `getRecentPrioritizationFees`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`

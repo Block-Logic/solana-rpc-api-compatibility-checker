@@ -171,6 +171,14 @@ pub enum MethodExpectation {
         #[serde(default)]
         required_parsed_attributes: Vec<String>,
     },
+    RecentPerformanceSamples {
+        minimum_result_count: usize,
+        required_sample_attributes: Vec<String>,
+    },
+    RecentPrioritizationFees {
+        minimum_result_count: usize,
+        required_fee_attributes: Vec<String>,
+    },
     TransactionSnapshot {
         required_result_attributes: Vec<String>,
         expected_result: serde_json::Value,
@@ -374,6 +382,14 @@ mod tests {
                 expected_data_encoding: _,
                 expected_parsed_program: _,
                 required_parsed_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::RecentPerformanceSamples {
+                minimum_result_count: _,
+                required_sample_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::RecentPrioritizationFees {
+                minimum_result_count: _,
+                required_fee_attributes: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::TransactionSnapshot {
                 required_result_attributes: _,
