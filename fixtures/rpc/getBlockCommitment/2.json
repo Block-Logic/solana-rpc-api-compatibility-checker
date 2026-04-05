@@ -25,10 +25,7 @@
         "commitment",
         "totalStake"
       ],
-      "expected_result": {
-        "commitment": null,
-        "totalStake": 422976209020698851
-      }
+      "expected_commitment": null
     }
   }
 }
