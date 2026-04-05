@@ -126,6 +126,11 @@ pub enum MethodExpectation {
         required_context_attributes: Vec<String>,
         required_value_attributes: Vec<String>,
     },
+    MaxRetransmitSlot,
+    MaxShredInsertSlot,
+    MinimumBalanceForRentExemption {
+        expected_value: u64,
+    },
     Balance {
         required_result_attributes: Vec<String>,
         required_context_attributes: Vec<String>,
@@ -332,6 +337,11 @@ mod tests {
                 required_context_attributes: _,
                 required_value_attributes: _,
             } => panic!("expected stringResult validator"),
+            MethodExpectation::MaxRetransmitSlot => panic!("expected stringResult validator"),
+            MethodExpectation::MaxShredInsertSlot => panic!("expected stringResult validator"),
+            MethodExpectation::MinimumBalanceForRentExemption { expected_value: _ } => {
+                panic!("expected stringResult validator")
+            }
             MethodExpectation::Balance {
                 required_result_attributes: _,
                 required_context_attributes: _,

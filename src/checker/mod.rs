@@ -22,6 +22,9 @@ mod get_inflation_reward;
 mod get_largest_accounts;
 mod get_latest_blockhash;
 mod get_leader_schedule;
+mod get_max_retransmit_slot;
+mod get_max_shred_insert_slot;
+mod get_minimum_balance_for_rent_exemption;
 mod get_multiple_accounts;
 mod get_program_accounts;
 mod get_transaction;
@@ -487,6 +490,9 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getLargestAccounts" => Ok(get_largest_accounts::validate),
         "getLeaderSchedule" => Ok(get_leader_schedule::validate),
         "getLatestBlockhash" => Ok(get_latest_blockhash::validate),
+        "getMaxRetransmitSlot" => Ok(get_max_retransmit_slot::validate),
+        "getMaxShredInsertSlot" => Ok(get_max_shred_insert_slot::validate),
+        "getMinimumBalanceForRentExemption" => Ok(get_minimum_balance_for_rent_exemption::validate),
         "getHealth" => Ok(get_health::validate),
         "getMultipleAccounts" => Ok(get_multiple_accounts::validate),
         "getProgramAccounts" => Ok(get_program_accounts::validate),
