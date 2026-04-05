@@ -10,6 +10,7 @@ mod get_blocks_with_limit;
 mod get_cluster_nodes;
 mod get_epoch_info;
 mod get_epoch_schedule;
+mod get_fee_for_message;
 mod get_health;
 mod get_multiple_accounts;
 mod get_program_accounts;
@@ -434,6 +435,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getClusterNodes" => Ok(get_cluster_nodes::validate),
         "getEpochInfo" => Ok(get_epoch_info::validate),
         "getEpochSchedule" => Ok(get_epoch_schedule::validate),
+        "getFeeForMessage" => Ok(get_fee_for_message::validate),
         "getHealth" => Ok(get_health::validate),
         "getMultipleAccounts" => Ok(get_multiple_accounts::validate),
         "getProgramAccounts" => Ok(get_program_accounts::validate),
