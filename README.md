@@ -89,6 +89,7 @@ as separate fixtures with different `params`.
 
 - `getHealth`: validates the health string response and is used as the gate for multi-method runs
 - `getEpochInfo`: validates the documented epoch info object for `processed`, `confirmed`, and `finalized` commitments
+- `getEpochSchedule`: validates the documented epoch schedule object shape without pinning cluster-specific values
 - `getBalance`: validates the documented balance response for finalized commitment and asserts the returned lamport balance is greater than zero
 - `getBlockCommitment`: validates exact block commitment snapshots for stable slots such as `2`
 - `getBlockHeight`: validates the documented finalized block height response and asserts the returned value is greater than zero
@@ -115,6 +116,7 @@ as separate fixtures with different `params`.
 - `src/checker/mod.rs`: shared runner, throttling, transport checks, and validator dispatch
 - `src/checker/get_health.rs`: method-specific validation for `getHealth`
 - `src/checker/get_epoch_info.rs`: method-specific validation for `getEpochInfo`
+- `src/checker/get_epoch_schedule.rs`: method-specific validation for `getEpochSchedule`
 - `src/checker/get_balance.rs`: method-specific validation for `getBalance`
 - `src/checker/get_block_commitment.rs`: method-specific validation for `getBlockCommitment`
 - `src/checker/get_block_height.rs`: method-specific validation for `getBlockHeight`
@@ -130,6 +132,7 @@ as separate fixtures with different `params`.
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `fixtures/rpc/getHealth/`: first fixture set for `getHealth`
 - `fixtures/rpc/getEpochInfo/`: commitment-specific fixtures for `getEpochInfo`
+- `fixtures/rpc/getEpochSchedule/`: structural fixtures for `getEpochSchedule`
 - `fixtures/rpc/getBalance/`: account-specific fixtures for `getBalance`
 - `fixtures/rpc/getBlockCommitment/`: block-specific fixtures for `getBlockCommitment`
 - `fixtures/rpc/getBlockHeight/`: finalized fixtures for `getBlockHeight`
