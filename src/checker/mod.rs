@@ -12,6 +12,7 @@ mod get_epoch_info;
 mod get_epoch_schedule;
 mod get_fee_for_message;
 mod get_first_available_block;
+mod get_genesis_hash;
 mod get_health;
 mod get_multiple_accounts;
 mod get_program_accounts;
@@ -438,6 +439,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getEpochSchedule" => Ok(get_epoch_schedule::validate),
         "getFeeForMessage" => Ok(get_fee_for_message::validate),
         "getFirstAvailableBlock" => Ok(get_first_available_block::validate),
+        "getGenesisHash" => Ok(get_genesis_hash::validate),
         "getHealth" => Ok(get_health::validate),
         "getMultipleAccounts" => Ok(get_multiple_accounts::validate),
         "getProgramAccounts" => Ok(get_program_accounts::validate),

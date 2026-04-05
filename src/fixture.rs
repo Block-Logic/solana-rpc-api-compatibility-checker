@@ -94,6 +94,7 @@ pub enum MethodExpectation {
     FirstAvailableBlock {
         expected_value: u64,
     },
+    GenesisHash,
     Balance {
         required_result_attributes: Vec<String>,
         required_context_attributes: Vec<String>,
@@ -268,6 +269,7 @@ mod tests {
             MethodExpectation::FirstAvailableBlock { expected_value: _ } => {
                 panic!("expected stringResult validator")
             }
+            MethodExpectation::GenesisHash => panic!("expected stringResult validator"),
             MethodExpectation::Balance {
                 required_result_attributes: _,
                 required_context_attributes: _,
