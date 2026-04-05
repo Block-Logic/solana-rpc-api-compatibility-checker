@@ -115,6 +115,9 @@ as separate fixtures with different `params`.
 - `getLargestAccounts`: validates the full largest-accounts response shape, and the current mainnet fixture pins the observed allowed-error response for the public endpoint
 - `getLeaderSchedule`: validates the finalized leader-schedule response shape as a validator-identity map whose values are arrays of slot indices
 - `getLatestBlockhash`: validates the finalized latest-blockhash response shape, including `context` and `value`, without pinning dynamic values
+- `getMaxRetransmitSlot`: validates the dynamic max retransmit slot response shape and asserts the returned slot is greater than zero
+- `getMaxShredInsertSlot`: validates the dynamic max shred insert slot response shape and asserts the returned slot is greater than zero
+- `getMinimumBalanceForRentExemption`: validates the exact processed rent-exemption minimum for a fixed size such as `100`
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
@@ -151,6 +154,9 @@ as separate fixtures with different `params`.
 - `src/checker/get_largest_accounts.rs`: method-specific validation for `getLargestAccounts`
 - `src/checker/get_leader_schedule.rs`: method-specific validation for `getLeaderSchedule`
 - `src/checker/get_latest_blockhash.rs`: method-specific validation for `getLatestBlockhash`
+- `src/checker/get_max_retransmit_slot.rs`: method-specific validation for `getMaxRetransmitSlot`
+- `src/checker/get_max_shred_insert_slot.rs`: method-specific validation for `getMaxShredInsertSlot`
+- `src/checker/get_minimum_balance_for_rent_exemption.rs`: method-specific validation for `getMinimumBalanceForRentExemption`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -178,6 +184,9 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getLargestAccounts/`: finalized fixtures for `getLargestAccounts`
 - `fixtures/rpc/getLeaderSchedule/`: finalized structural fixtures for `getLeaderSchedule`
 - `fixtures/rpc/getLatestBlockhash/`: finalized structural fixtures for `getLatestBlockhash`
+- `fixtures/rpc/getMaxRetransmitSlot/`: shape fixtures for `getMaxRetransmitSlot`
+- `fixtures/rpc/getMaxShredInsertSlot/`: shape fixtures for `getMaxShredInsertSlot`
+- `fixtures/rpc/getMinimumBalanceForRentExemption/`: exact-value fixtures for `getMinimumBalanceForRentExemption`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`
