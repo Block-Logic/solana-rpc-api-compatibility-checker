@@ -27,6 +27,8 @@ mod get_max_shred_insert_slot;
 mod get_minimum_balance_for_rent_exemption;
 mod get_multiple_accounts;
 mod get_program_accounts;
+mod get_recent_performance_samples;
+mod get_recent_prioritization_fees;
 mod get_transaction;
 
 use crate::config::Config;
@@ -496,6 +498,8 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getHealth" => Ok(get_health::validate),
         "getMultipleAccounts" => Ok(get_multiple_accounts::validate),
         "getProgramAccounts" => Ok(get_program_accounts::validate),
+        "getRecentPerformanceSamples" => Ok(get_recent_performance_samples::validate),
+        "getRecentPrioritizationFees" => Ok(get_recent_prioritization_fees::validate),
         "getTransaction" => Ok(get_transaction::validate),
         other => anyhow::bail!("no validator registered for RPC method '{other}'"),
     }

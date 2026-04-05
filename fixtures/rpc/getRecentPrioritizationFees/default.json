@@ -1,0 +1,29 @@
+{
+  "name": "getRecentPrioritizationFees default",
+  "method": "getRecentPrioritizationFees",
+  "request": {
+    "params": []
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "recentPrioritizationFees",
+      "minimum_result_count": 1,
+      "required_fee_attributes": [
+        "prioritizationFee",
+        "slot"
+      ]
+    }
+  }
+}
