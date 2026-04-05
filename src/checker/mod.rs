@@ -15,6 +15,7 @@ mod get_first_available_block;
 mod get_genesis_hash;
 mod get_health;
 mod get_highest_snapshot_slot;
+mod get_identity;
 mod get_multiple_accounts;
 mod get_program_accounts;
 mod get_transaction;
@@ -442,6 +443,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getFirstAvailableBlock" => Ok(get_first_available_block::validate),
         "getGenesisHash" => Ok(get_genesis_hash::validate),
         "getHighestSnapshotSlot" => Ok(get_highest_snapshot_slot::validate),
+        "getIdentity" => Ok(get_identity::validate),
         "getHealth" => Ok(get_health::validate),
         "getMultipleAccounts" => Ok(get_multiple_accounts::validate),
         "getProgramAccounts" => Ok(get_program_accounts::validate),
