@@ -120,6 +120,9 @@ as separate fixtures with different `params`.
 - `getMinimumBalanceForRentExemption`: validates the exact processed rent-exemption minimum for a fixed size such as `100`
 - `getRecentPerformanceSamples`: validates the full response shape for a dynamic recent-performance-samples array without pinning the returned values
 - `getRecentPrioritizationFees`: validates the full response shape for a dynamic recent-prioritization-fees array without pinning the returned values
+- `getSignaturesForAddress`: validates the full response shape for a dynamic signatures-for-address array without pinning the returned entries
+- `getSignatureStatuses`: validates the stable signature-status payload for a fixed signature while treating `context.slot` as dynamic
+- `getSlot`: validates the dynamic slot response shape and asserts the returned slot is greater than zero
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
@@ -161,6 +164,9 @@ as separate fixtures with different `params`.
 - `src/checker/get_minimum_balance_for_rent_exemption.rs`: method-specific validation for `getMinimumBalanceForRentExemption`
 - `src/checker/get_recent_performance_samples.rs`: method-specific validation for `getRecentPerformanceSamples`
 - `src/checker/get_recent_prioritization_fees.rs`: method-specific validation for `getRecentPrioritizationFees`
+- `src/checker/get_signatures_for_address.rs`: method-specific validation for `getSignaturesForAddress`
+- `src/checker/get_signature_statuses.rs`: method-specific validation for `getSignatureStatuses`
+- `src/checker/get_slot.rs`: method-specific validation for `getSlot`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -193,6 +199,9 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getMinimumBalanceForRentExemption/`: exact-value fixtures for `getMinimumBalanceForRentExemption`
 - `fixtures/rpc/getRecentPerformanceSamples/`: structural fixtures for `getRecentPerformanceSamples`
 - `fixtures/rpc/getRecentPrioritizationFees/`: structural fixtures for `getRecentPrioritizationFees`
+- `fixtures/rpc/getSignaturesForAddress/`: structural fixtures for `getSignaturesForAddress`
+- `fixtures/rpc/getSignatureStatuses/`: stable-value fixtures for `getSignatureStatuses`
+- `fixtures/rpc/getSlot/`: shape fixtures for `getSlot`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`

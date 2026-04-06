@@ -1,0 +1,38 @@
+{
+  "name": "getSignaturesForAddress ping6g limit 10",
+  "method": "getSignaturesForAddress",
+  "request": {
+    "params": [
+      "ping6gwBZx1ccMMFyLgkVSupUmujYrFidEXuNRPq989",
+      {
+        "limit": 10
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "signaturesForAddress",
+      "minimum_result_count": 1,
+      "required_signature_attributes": [
+        "blockTime",
+        "confirmationStatus",
+        "err",
+        "memo",
+        "signature",
+        "slot"
+      ]
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "getSignatureStatuses 3mabcf search history",
+  "method": "getSignatureStatuses",
+  "request": {
+    "params": [
+      [
+        "3mabcf8u7eduVN3GfM8nyGwJ3g3GqApqbGq8m2CtoakgeEVHsw1ZgqSL7KWCRaEdK9rcHUwWNfpkGAb17ewC6XwV"
+      ],
+      {
+        "searchTransactionHistory": true
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": [
+        "jsonrpc",
+        "result",
+        "id"
+      ]
+    },
+    "validator": {
+      "kind": "signatureStatuses",
+      "required_result_attributes": [
+        "context",
+        "value"
+      ],
+      "required_context_attributes": [
+        "apiVersion",
+        "slot"
+      ],
+      "expected_api_version": "3.1.11",
+      "expected_value": [
+        {
+          "confirmationStatus": "finalized",
+          "confirmations": null,
+          "err": null,
+          "slot": 2,
+          "status": {
+            "Ok": null
+          }
+        }
+      ]
+    }
+  }
+}
