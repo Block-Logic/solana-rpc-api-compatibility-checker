@@ -1,0 +1,51 @@
+{
+  "name": "getTokenAccountsByOwner ping6g USDC finalized jsonParsed",
+  "method": "getTokenAccountsByOwner",
+  "request": {
+    "params": [
+      "ping6gwBZx1ccMMFyLgkVSupUmujYrFidEXuNRPq989",
+      {
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+      },
+      {
+        "commitment": "finalized",
+        "encoding": "jsonParsed"
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "tokenAccountsByOwner",
+      "minimum_result_count": 1,
+      "required_result_attributes": ["context", "value"],
+      "required_context_attributes": ["apiVersion", "slot"],
+      "required_value_entry_attributes": ["account", "pubkey"],
+      "required_account_attributes": [
+        "data",
+        "executable",
+        "lamports",
+        "owner",
+        "rentEpoch",
+        "space"
+      ],
+      "required_token_amount_attributes": [
+        "amount",
+        "decimals",
+        "uiAmount",
+        "uiAmountString"
+      ],
+      "expected_account_owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "expected_data_program": "spl-token",
+      "expected_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "expected_token_owner": "ping6gwBZx1ccMMFyLgkVSupUmujYrFidEXuNRPq989"
+    }
+  }
+}
