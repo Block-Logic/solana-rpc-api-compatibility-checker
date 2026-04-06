@@ -48,6 +48,8 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::{Duration, Instant, sleep};
 
+const GET_BLOCK_MINIMUM_REQUEST_INTERVAL_MS: u64 = 3_000;
+
 #[derive(Debug)]
 pub struct CompatibilityReport {
     checks: Vec<CheckOutcome>,
@@ -125,25 +127,23 @@ enum CheckStatus {
 
 #[derive(Debug)]
 struct RequestThrottler {
-    minimum_interval: Duration,
     last_request_started_at: Mutex<Option<Instant>>,
 }
 
 impl RequestThrottler {
-    fn new(minimum_interval: Duration) -> Self {
+    fn new() -> Self {
         Self {
-            minimum_interval,
             last_request_started_at: Mutex::new(None),
         }
     }
 
-    async fn wait_for_turn(&self) {
+    async fn wait_for_turn(&self, minimum_interval: Duration) {
         let mut guard = self.last_request_started_at.lock().await;
 
         if let Some(last_started_at) = *guard {
             let elapsed = last_started_at.elapsed();
-            if elapsed < self.minimum_interval {
-                sleep(self.minimum_interval - elapsed).await;
+            if elapsed < minimum_interval {
+                sleep(minimum_interval - elapsed).await;
             }
         }
 
@@ -187,9 +187,7 @@ pub async fn run_checks_with_options(
         ))
         .build()
         .context("failed to construct HTTP client")?;
-    let throttler = Arc::new(RequestThrottler::new(Duration::from_millis(
-        config.minimum_request_interval_ms,
-    )));
+    let throttler = Arc::new(RequestThrottler::new());
     let mut checks = Vec::new();
     let ordered_fixtures = order_fixtures(fixtures);
     let requires_health_gate = requires_health_gate(fixtures);
@@ -288,9 +286,10 @@ async fn send_rpc_request_with_retry(
 ) -> Result<reqwest::Response> {
     const MAX_ATTEMPTS: usize = 5;
     const TOO_MANY_REQUESTS_BACKOFF_MS: u64 = 10_000;
+    let request_interval = minimum_request_interval_for_fixture(config, fixture);
 
     for attempt in 1..=MAX_ATTEMPTS {
-        throttler.wait_for_turn().await;
+        throttler.wait_for_turn(request_interval).await;
         let response = client
             .post(&config.rpc_endpoint)
             .header(CONTENT_TYPE, "application/json")
@@ -313,6 +312,17 @@ async fn send_rpc_request_with_retry(
     }
 
     unreachable!("the retry loop always returns a response or error")
+}
+
+fn minimum_request_interval_for_fixture(config: &Config, fixture: &RpcFixture) -> Duration {
+    let minimum_interval_ms = match fixture.method.as_str() {
+        "getBlock" => config
+            .minimum_request_interval_ms
+            .max(GET_BLOCK_MINIMUM_REQUEST_INTERVAL_MS),
+        _ => config.minimum_request_interval_ms,
+    };
+
+    Duration::from_millis(minimum_interval_ms)
 }
 
 fn validate_response(
@@ -603,6 +613,35 @@ mod tests {
     fn rejects_missing_charset() {
         let error = validate_charset("application/json", "utf-8").expect_err("missing charset");
         assert!(error.to_string().contains("none was provided"));
+    }
+
+    #[test]
+    fn uses_longer_minimum_request_interval_for_get_block() {
+        let config = Config {
+            rpc_endpoint: "https://example.com".to_string(),
+            minimum_request_interval_ms: 2_000,
+        };
+        let mut fixture = fixture();
+        fixture.method = "getBlock".to_string();
+
+        let interval = minimum_request_interval_for_fixture(&config, &fixture);
+
+        assert_eq!(
+            interval,
+            Duration::from_millis(GET_BLOCK_MINIMUM_REQUEST_INTERVAL_MS)
+        );
+    }
+
+    #[test]
+    fn preserves_configured_request_interval_for_other_methods() {
+        let config = Config {
+            rpc_endpoint: "https://example.com".to_string(),
+            minimum_request_interval_ms: 2_000,
+        };
+
+        let interval = minimum_request_interval_for_fixture(&config, &fixture());
+
+        assert_eq!(interval, Duration::from_millis(2_000));
     }
 
     #[test]
