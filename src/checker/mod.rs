@@ -35,6 +35,7 @@ mod get_slot;
 mod get_slot_leader;
 mod get_slot_leaders;
 mod get_stake_minimum_delegation;
+mod get_supply;
 mod get_transaction;
 
 use crate::config::Config;
@@ -608,6 +609,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getSlotLeader" => Ok(get_slot_leader::validate),
         "getSlotLeaders" => Ok(get_slot_leaders::validate),
         "getStakeMinimumDelegation" => Ok(get_stake_minimum_delegation::validate),
+        "getSupply" => Ok(get_supply::validate),
         "getTransaction" => Ok(get_transaction::validate),
         other => anyhow::bail!("no validator registered for RPC method '{other}'"),
     }
