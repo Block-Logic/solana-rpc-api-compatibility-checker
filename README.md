@@ -123,6 +123,7 @@ as separate fixtures with different `params`.
 - `getSignaturesForAddress`: validates the full response shape for a dynamic signatures-for-address array without pinning the returned entries
 - `getSignatureStatuses`: validates the stable signature-status payload for a fixed signature while treating `context.slot` as dynamic
 - `getSlot`: validates the dynamic slot response shape and asserts the returned slot is greater than zero
+- `getSlotLeader`: validates the dynamic slot-leader response shape and checks that the returned leader identity is a non-empty string
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
@@ -167,6 +168,7 @@ as separate fixtures with different `params`.
 - `src/checker/get_signatures_for_address.rs`: method-specific validation for `getSignaturesForAddress`
 - `src/checker/get_signature_statuses.rs`: method-specific validation for `getSignatureStatuses`
 - `src/checker/get_slot.rs`: method-specific validation for `getSlot`
+- `src/checker/get_slot_leader.rs`: method-specific validation for `getSlotLeader`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -202,6 +204,7 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getSignaturesForAddress/`: structural fixtures for `getSignaturesForAddress`
 - `fixtures/rpc/getSignatureStatuses/`: stable-value fixtures for `getSignatureStatuses`
 - `fixtures/rpc/getSlot/`: shape fixtures for `getSlot`
+- `fixtures/rpc/getSlotLeader/`: shape fixtures for `getSlotLeader`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`

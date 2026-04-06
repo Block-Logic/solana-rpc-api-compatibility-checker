@@ -32,6 +32,7 @@ mod get_recent_prioritization_fees;
 mod get_signature_statuses;
 mod get_signatures_for_address;
 mod get_slot;
+mod get_slot_leader;
 mod get_transaction;
 
 use crate::config::Config;
@@ -516,6 +517,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getSignaturesForAddress" => Ok(get_signatures_for_address::validate),
         "getSignatureStatuses" => Ok(get_signature_statuses::validate),
         "getSlot" => Ok(get_slot::validate),
+        "getSlotLeader" => Ok(get_slot_leader::validate),
         "getTransaction" => Ok(get_transaction::validate),
         other => anyhow::bail!("no validator registered for RPC method '{other}'"),
     }
