@@ -213,7 +213,10 @@ mod tests {
             RpcFixture {
                 name: "health".to_string(),
                 method: "getHealth".to_string(),
-                request: fixture::RequestFixture { params: Vec::new() },
+                request: fixture::RequestFixture {
+                    params: Vec::new(),
+                    dynamic_params: Vec::new(),
+                },
                 expectation: fixture::ResponseExpectation {
                     transport: fixture::TransportExpectation {
                         content_type_prefix: "application/json".to_string(),
@@ -237,7 +240,10 @@ mod tests {
             RpcFixture {
                 name: "epoch".to_string(),
                 method: "getEpochInfo".to_string(),
-                request: fixture::RequestFixture { params: Vec::new() },
+                request: fixture::RequestFixture {
+                    params: Vec::new(),
+                    dynamic_params: Vec::new(),
+                },
                 expectation: fixture::ResponseExpectation {
                     transport: fixture::TransportExpectation {
                         content_type_prefix: "application/json".to_string(),

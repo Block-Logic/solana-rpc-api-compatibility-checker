@@ -1,0 +1,27 @@
+{
+  "name": "getSlotLeaders processed slot limit 8",
+  "method": "getSlotLeaders",
+  "request": {
+    "params": [null, 8],
+    "dynamic_params": [
+      {
+        "kind": "processedSlot",
+        "index": 0
+      }
+    ]
+  },
+  "expectation": {
+    "transport": {
+      "content_type_prefix": "application/json",
+      "charset": "utf-8"
+    },
+    "envelope": {
+      "jsonrpc_version": "2.0",
+      "required_attributes": ["jsonrpc", "result", "id"]
+    },
+    "validator": {
+      "kind": "slotLeaders",
+      "expected_result_length": 8
+    }
+  }
+}

@@ -33,10 +33,11 @@ mod get_signature_statuses;
 mod get_signatures_for_address;
 mod get_slot;
 mod get_slot_leader;
+mod get_slot_leaders;
 mod get_transaction;
 
 use crate::config::Config;
-use crate::fixture::{JsonRpcErrorExpectation, MethodExpectation, RpcFixture};
+use crate::fixture::{DynamicRequestParam, JsonRpcErrorExpectation, MethodExpectation, RpcFixture};
 use anyhow::{Context, Result};
 use reqwest::StatusCode;
 use reqwest::header::CONTENT_TYPE;
@@ -245,11 +246,12 @@ async fn run_single_check(
     show_failure_response: bool,
 ) -> Result<String> {
     let request_id = fixture.name.clone();
+    let request_params = resolve_request_params(client, throttler.clone(), config, fixture).await?;
     let payload = JsonRpcRequest {
         jsonrpc: "2.0",
         id: request_id.clone(),
         method: &fixture.method,
-        params: &fixture.request.params,
+        params: &request_params,
     };
 
     let response =
@@ -276,6 +278,91 @@ async fn run_single_check(
         )),
         Err(error) => Err(error),
     }
+}
+
+async fn resolve_request_params(
+    client: &reqwest::Client,
+    throttler: Arc<RequestThrottler>,
+    config: &Config,
+    fixture: &RpcFixture,
+) -> Result<Vec<Value>> {
+    let mut params = fixture.request.params.clone();
+
+    for dynamic_param in &fixture.request.dynamic_params {
+        match dynamic_param {
+            DynamicRequestParam::ProcessedSlot { index } => {
+                let slot = fetch_processed_slot(client, throttler.clone(), config).await?;
+                let params_len = params.len();
+                let target = params.get_mut(*index).with_context(|| {
+                    format!(
+                        "dynamic processedSlot parameter index {} was outside params length {}",
+                        index, params_len
+                    )
+                })?;
+                *target = Value::from(slot);
+            }
+        }
+    }
+
+    Ok(params)
+}
+
+async fn fetch_processed_slot(
+    client: &reqwest::Client,
+    throttler: Arc<RequestThrottler>,
+    config: &Config,
+) -> Result<u64> {
+    const MAX_ATTEMPTS: usize = 5;
+    const TOO_MANY_REQUESTS_BACKOFF_MS: u64 = 10_000;
+
+    let params = vec![serde_json::json!({ "commitment": "processed" })];
+    let payload = JsonRpcRequest {
+        jsonrpc: "2.0",
+        id: "dynamic-getSlot-processed".to_string(),
+        method: "getSlot",
+        params: &params,
+    };
+    let request_interval = Duration::from_millis(config.minimum_request_interval_ms);
+
+    for attempt in 1..=MAX_ATTEMPTS {
+        throttler.wait_for_turn(request_interval).await;
+        let response = client
+            .post(&config.rpc_endpoint)
+            .header(CONTENT_TYPE, "application/json")
+            .json(&payload)
+            .send()
+            .await
+            .context("dynamic getSlot processed request failed")?;
+
+        if response.status() == StatusCode::TOO_MANY_REQUESTS && attempt < MAX_ATTEMPTS {
+            sleep(Duration::from_millis(TOO_MANY_REQUESTS_BACKOFF_MS)).await;
+            continue;
+        }
+
+        let status = response.status();
+        let body_text = response
+            .text()
+            .await
+            .context("failed to read dynamic getSlot processed response body")?;
+        if !status.is_success() {
+            anyhow::bail!(
+                "dynamic getSlot processed expected an HTTP success status, received {status}"
+            );
+        }
+
+        let document: Value = serde_json::from_str(&body_text)
+            .context("dynamic getSlot processed response body was not valid JSON")?;
+        if let Some(error) = document.get("error") {
+            anyhow::bail!("dynamic getSlot processed returned JSON-RPC error payload: {error}");
+        }
+
+        return document
+            .get("result")
+            .and_then(Value::as_u64)
+            .context("dynamic getSlot processed result was not a u64");
+    }
+
+    unreachable!("the retry loop always returns a response or error")
 }
 
 async fn send_rpc_request_with_retry(
@@ -518,6 +605,7 @@ fn validator_for_method(method: &str) -> Result<MethodValidator> {
         "getSignatureStatuses" => Ok(get_signature_statuses::validate),
         "getSlot" => Ok(get_slot::validate),
         "getSlotLeader" => Ok(get_slot_leader::validate),
+        "getSlotLeaders" => Ok(get_slot_leaders::validate),
         "getTransaction" => Ok(get_transaction::validate),
         other => anyhow::bail!("no validator registered for RPC method '{other}'"),
     }
@@ -575,7 +663,10 @@ mod tests {
         RpcFixture {
             name: "getHealth returns ok".to_string(),
             method: "getHealth".to_string(),
-            request: RequestFixture { params: Vec::new() },
+            request: RequestFixture {
+                params: Vec::new(),
+                dynamic_params: Vec::new(),
+            },
             expectation: ResponseExpectation {
                 transport: TransportExpectation {
                     content_type_prefix: "application/json".to_string(),
@@ -847,6 +938,7 @@ mod tests {
                 method: "getEpochInfo".to_string(),
                 request: RequestFixture {
                     params: vec![serde_json::json!({"commitment":"finalized"})],
+                    dynamic_params: Vec::new(),
                 },
                 expectation: ResponseExpectation {
                     transport: TransportExpectation {
@@ -878,7 +970,10 @@ mod tests {
             RpcFixture {
                 name: "getBalance sample".to_string(),
                 method: "getBalance".to_string(),
-                request: RequestFixture { params: Vec::new() },
+                request: RequestFixture {
+                    params: Vec::new(),
+                    dynamic_params: Vec::new(),
+                },
                 expectation: ResponseExpectation {
                     transport: TransportExpectation {
                         content_type_prefix: "application/json".to_string(),

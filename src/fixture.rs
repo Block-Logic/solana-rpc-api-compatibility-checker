@@ -15,6 +15,14 @@ pub struct RpcFixture {
 pub struct RequestFixture {
     #[serde(default)]
     pub params: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub dynamic_params: Vec<DynamicRequestParam>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum DynamicRequestParam {
+    ProcessedSlot { index: usize },
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -128,6 +136,9 @@ pub enum MethodExpectation {
     },
     Slot,
     SlotLeader,
+    SlotLeaders {
+        expected_result_length: usize,
+    },
     MaxRetransmitSlot,
     MaxShredInsertSlot,
     MinimumBalanceForRentExemption {
@@ -275,6 +286,7 @@ mod tests {
 
         assert_eq!(fixture.method, "getHealth");
         assert!(fixture.request.params.is_empty());
+        assert!(fixture.request.dynamic_params.is_empty());
         assert_eq!(
             fixture.expectation.envelope.required_attributes,
             vec!["jsonrpc", "result", "id"]
@@ -359,6 +371,9 @@ mod tests {
             } => panic!("expected stringResult validator"),
             MethodExpectation::Slot => panic!("expected stringResult validator"),
             MethodExpectation::SlotLeader => panic!("expected stringResult validator"),
+            MethodExpectation::SlotLeaders {
+                expected_result_length: _,
+            } => panic!("expected stringResult validator"),
             MethodExpectation::MaxRetransmitSlot => panic!("expected stringResult validator"),
             MethodExpectation::MaxShredInsertSlot => panic!("expected stringResult validator"),
             MethodExpectation::MinimumBalanceForRentExemption { expected_value: _ } => {
@@ -451,10 +466,53 @@ mod tests {
         .expect("fixture should parse");
 
         assert!(fixture.request.params.is_empty());
+        assert!(fixture.request.dynamic_params.is_empty());
         assert_eq!(
             fixture.expectation.envelope.required_attributes,
             vec!["jsonrpc", "result", "id"]
         );
         assert!(fixture.expectation.envelope.expected_error.is_none());
+    }
+
+    #[test]
+    fn parses_dynamic_processed_slot_request_param() {
+        let fixture: RpcFixture = serde_json::from_str(
+            r#"{
+                "name": "getSlotLeaders dynamic",
+                "method": "getSlotLeaders",
+                "request": {
+                    "params": [null, 8],
+                    "dynamic_params": [
+                        {
+                            "kind": "processedSlot",
+                            "index": 0
+                        }
+                    ]
+                },
+                "expectation": {
+                    "transport": {
+                        "content_type_prefix": "application/json",
+                        "charset": "utf-8"
+                    },
+                    "envelope": {
+                        "jsonrpc_version": "2.0"
+                    },
+                    "validator": {
+                        "kind": "slotLeaders",
+                        "expected_result_length": 8
+                    }
+                }
+            }"#,
+        )
+        .expect("fixture should parse");
+
+        assert_eq!(
+            fixture.request.params,
+            vec![serde_json::json!(null), serde_json::json!(8)]
+        );
+        assert_eq!(fixture.request.dynamic_params.len(), 1);
+        match &fixture.request.dynamic_params[0] {
+            DynamicRequestParam::ProcessedSlot { index } => assert_eq!(*index, 0),
+        }
     }
 }
