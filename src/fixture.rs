@@ -126,6 +126,7 @@ pub enum MethodExpectation {
         required_context_attributes: Vec<String>,
         required_value_attributes: Vec<String>,
     },
+    Slot,
     MaxRetransmitSlot,
     MaxShredInsertSlot,
     MinimumBalanceForRentExemption {
@@ -178,6 +179,16 @@ pub enum MethodExpectation {
     RecentPrioritizationFees {
         minimum_result_count: usize,
         required_fee_attributes: Vec<String>,
+    },
+    SignaturesForAddress {
+        minimum_result_count: usize,
+        required_signature_attributes: Vec<String>,
+    },
+    SignatureStatuses {
+        required_result_attributes: Vec<String>,
+        required_context_attributes: Vec<String>,
+        expected_value: serde_json::Value,
+        expected_api_version: String,
     },
     TransactionSnapshot {
         required_result_attributes: Vec<String>,
@@ -345,6 +356,7 @@ mod tests {
                 required_context_attributes: _,
                 required_value_attributes: _,
             } => panic!("expected stringResult validator"),
+            MethodExpectation::Slot => panic!("expected stringResult validator"),
             MethodExpectation::MaxRetransmitSlot => panic!("expected stringResult validator"),
             MethodExpectation::MaxShredInsertSlot => panic!("expected stringResult validator"),
             MethodExpectation::MinimumBalanceForRentExemption { expected_value: _ } => {
@@ -390,6 +402,16 @@ mod tests {
             MethodExpectation::RecentPrioritizationFees {
                 minimum_result_count: _,
                 required_fee_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::SignaturesForAddress {
+                minimum_result_count: _,
+                required_signature_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::SignatureStatuses {
+                required_result_attributes: _,
+                required_context_attributes: _,
+                expected_value: _,
+                expected_api_version: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::TransactionSnapshot {
                 required_result_attributes: _,
