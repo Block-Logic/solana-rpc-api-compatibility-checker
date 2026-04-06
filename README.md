@@ -127,6 +127,7 @@ as separate fixtures with different `params`.
 - `getSlotLeaders`: validates the dynamic slot-leaders response shape using a freshly fetched processed slot and a limit of `8`
 - `getStakeMinimumDelegation`: validates the finalized stake-minimum-delegation response shape and asserts the returned lamport value is greater than zero
 - `getSupply`: validates the finalized supply response shape, including `context`, supply counters, and the non-circulating account list, without pinning dynamic values
+- `getTokenAccountBalance`: validates the finalized token-account balance response shape for a fixed token account without pinning dynamic token amount values
 - `getMultipleAccounts`: validates structural multi-account responses for supported finalized encodings such as `base58`, `base64`, `base64+zstd`, and `jsonParsed`
   The validator checks `result.context`, preserves account order, and validates each returned account entry
 - `getProgramAccounts`: validates structural account-list responses for live stake-program queries using finalized commitment and supported encodings such as `base64`, `base64+zstd`, and `jsonParsed`
@@ -175,6 +176,7 @@ as separate fixtures with different `params`.
 - `src/checker/get_slot_leaders.rs`: method-specific validation for `getSlotLeaders`
 - `src/checker/get_stake_minimum_delegation.rs`: method-specific validation for `getStakeMinimumDelegation`
 - `src/checker/get_supply.rs`: method-specific validation for `getSupply`
+- `src/checker/get_token_account_balance.rs`: method-specific validation for `getTokenAccountBalance`
 - `src/checker/get_multiple_accounts.rs`: method-specific validation for `getMultipleAccounts`
 - `src/checker/get_program_accounts.rs`: method-specific validation for `getProgramAccounts`
 - `src/checker/get_transaction.rs`: method-specific validation for `getTransaction`
@@ -214,6 +216,7 @@ as separate fixtures with different `params`.
 - `fixtures/rpc/getSlotLeaders/`: dynamic-slot fixtures for `getSlotLeaders`
 - `fixtures/rpc/getStakeMinimumDelegation/`: finalized structural fixtures for `getStakeMinimumDelegation`
 - `fixtures/rpc/getSupply/`: finalized structural fixtures for `getSupply`
+- `fixtures/rpc/getTokenAccountBalance/`: token-account fixtures for `getTokenAccountBalance`
 - `fixtures/rpc/getMultipleAccounts/`: account-list fixtures for `getMultipleAccounts`
 - `fixtures/rpc/getProgramAccounts/`: encoding-specific fixtures for `getProgramAccounts`
 - `fixtures/rpc/getTransaction/`: signature-specific fixtures for `getTransaction`

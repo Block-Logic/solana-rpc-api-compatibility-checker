@@ -148,6 +148,11 @@ pub enum MethodExpectation {
         required_context_attributes: Vec<String>,
         required_value_attributes: Vec<String>,
     },
+    TokenAccountBalance {
+        required_result_attributes: Vec<String>,
+        required_context_attributes: Vec<String>,
+        required_value_attributes: Vec<String>,
+    },
     MaxRetransmitSlot,
     MaxShredInsertSlot,
     MinimumBalanceForRentExemption {
@@ -388,6 +393,11 @@ mod tests {
                 required_context_attributes: _,
             } => panic!("expected stringResult validator"),
             MethodExpectation::Supply {
+                required_result_attributes: _,
+                required_context_attributes: _,
+                required_value_attributes: _,
+            } => panic!("expected stringResult validator"),
+            MethodExpectation::TokenAccountBalance {
                 required_result_attributes: _,
                 required_context_attributes: _,
                 required_value_attributes: _,
