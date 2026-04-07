@@ -451,7 +451,7 @@ fn validate_response(
         );
     }
 
-    if !(allows_rate_limit_error && !content_type.to_ascii_lowercase().contains("charset=")) {
+    if should_validate_charset(fixture, content_type, allows_rate_limit_error) {
         validate_charset(content_type, &fixture.expectation.transport.charset)?;
     }
 
@@ -554,6 +554,18 @@ fn validate_expected_error(
         "error.code={} error.message='{}'",
         actual_code, actual_message
     ))
+}
+
+fn should_validate_charset(
+    fixture: &RpcFixture,
+    content_type: &str,
+    allows_rate_limit_error: bool,
+) -> bool {
+    if fixture.method == "getHealth" {
+        return false;
+    }
+
+    !(allows_rate_limit_error && !content_type.to_ascii_lowercase().contains("charset="))
 }
 
 fn validate_charset(content_type: &str, expected_charset: &str) -> Result<()> {
@@ -711,8 +723,39 @@ mod tests {
     }
 
     #[test]
+    fn validates_get_health_without_charset() {
+        let response = HttpResponseData {
+            status: reqwest::StatusCode::OK,
+            content_type: Some("application/json".to_string()),
+            body_text: r#"{"jsonrpc":"2.0","result":"ok","id":"getHealth returns ok"}"#.to_string(),
+        };
+
+        let result = validate_response(&fixture(), "getHealth returns ok", &response);
+
+        assert!(result.is_ok(), "expected validation to pass: {result:?}");
+    }
+
+    #[test]
     fn rejects_missing_charset() {
         let error = validate_charset("application/json", "utf-8").expect_err("missing charset");
+        assert!(error.to_string().contains("none was provided"));
+    }
+
+    #[test]
+    fn still_rejects_missing_charset_for_non_health_success_response() {
+        let mut fixture = fixture();
+        fixture.name = "getSlot default".to_string();
+        fixture.method = "getSlot".to_string();
+        fixture.expectation.validator = MethodExpectation::Slot;
+        let response = HttpResponseData {
+            status: reqwest::StatusCode::OK,
+            content_type: Some("application/json".to_string()),
+            body_text: r#"{"jsonrpc":"2.0","result":123,"id":"getSlot default"}"#.to_string(),
+        };
+
+        let error = validate_response(&fixture, "getSlot default", &response)
+            .expect_err("missing charset should fail for non-health methods");
+
         assert!(error.to_string().contains("none was provided"));
     }
 
